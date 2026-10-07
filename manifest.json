@@ -1,9 +1,0 @@
-{
-  "name": "Metal Tracker",
-  "short_name": "Metal Tracker",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
-  "description": "Track silver, gold and copper holdings and melt values."
-}
