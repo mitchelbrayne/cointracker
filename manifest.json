@@ -1,10 +1,16 @@
 {
-  "name":"Coin Tracker",
-  "short_name":"Coin Tracker",
-  "start_url":"./",
-  "scope":"./",
-  "display":"standalone",
-  "background_color":"#0b0d10",
-  "theme_color":"#0b0d10",
-  "icons":[{"src":"./icon-180.png","sizes":"180x180","type":"image/png","purpose":"any maskable"}]
+  "name": "Coin Tracker",
+  "short_name": "Coin Tracker",
+  "start_url": "./?v=8",
+  "display": "standalone",
+  "background_color": "#090909",
+  "theme_color": "#090909",
+  "icons": [
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
