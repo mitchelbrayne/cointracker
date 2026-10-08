@@ -209,7 +209,7 @@ async function importV2(file){
    let metal=String(o.metal||"silver").toLowerCase();
    metal=metal==="gold"?"Gold":metal==="copper"?"Copper":"Silver";
    const x={
-     catalogue:$("catalogue").value||old?.catalogue||"",
+     catalogue:"",
      id:"v2-"+(o.id||Date.now()+"-"+i),
      sourceKey:source,
      created:Date.parse(o.date)||Date.now(),
