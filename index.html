@@ -9,25 +9,30 @@
 <title>Coin Tracker</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#090909;color:#eee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:640px;margin:auto;padding:16px 14px 40px}h1{font-size:28px;margin:6px 0 4px}.sub{color:#999;font-size:13px;margin-bottom:18px}
-.card{background:#151515;border:1px solid #292929;border-radius:16px;padding:14px;margin:12px 0}
-h2{font-size:19px;margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
-label{display:block;font-size:12px;color:#aaa;margin:9px 0 4px}input,select,button{width:100%;font:inherit;border-radius:10px;border:1px solid #363636;background:#0e0e0e;color:#fff;padding:11px}
-button{background:#242424;font-weight:600;cursor:pointer}button.primary{background:#d5ad58;color:#111;border:0}button.danger{background:#3a1717}.tot{font-size:20px;font-weight:700;margin:5px 0}.small{font-size:12px;color:#aaa}.item{border-top:1px solid #292929;padding:12px 0}.item:first-child{border-top:0}.thumbs{display:flex;gap:8px;margin:8px 0}.thumbs img{width:92px;height:92px;object-fit:cover;border-radius:10px;border:1px solid #333}.pill{display:inline-block;background:#272727;border-radius:999px;padding:4px 8px;font-size:11px;margin:2px 3px 2px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.notice{padding:10px;border-radius:10px;background:#211d14;color:#e6c97c;font-size:13px}.hidden{display:none!important}
-#viewer{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:10;display:flex;align-items:center;justify-content:center;padding:20px}
-#viewer img{max-width:100%;max-height:90%;object-fit:contain}.close{position:absolute;right:14px;top:14px;width:auto;padding:10px 14px}
-hr{border:0;border-top:1px solid #292929;margin:14px 0}
+main{max-width:640px;margin:auto;padding:16px 14px 44px}h1{font-size:28px;margin:4px 0}.sub{color:#999;font-size:13px;margin-bottom:14px}
+.card{background:#151515;border:1px solid #292929;border-radius:16px;padding:14px;margin:12px 0}.card h2{font-size:19px;margin:0 0 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:135px}.searchrow{display:flex;gap:8px}.searchrow input{flex:1}.searchrow button{width:auto;min-width:90px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}label{display:block;color:#aaa;font-size:12px;margin:8px 0 4px}
+input,select,button{width:100%;font:inherit;border-radius:10px;border:1px solid #363636;background:#0e0e0e;color:#fff;padding:11px}
+button{background:#242424;font-weight:600}.primary{background:#d5ad58;color:#111;border:0}.danger{background:#3b1818}
+.small{font-size:12px;color:#aaa}.notice{background:#211d14;color:#e6c97c;border-radius:10px;padding:10px;font-size:13px}
+hr{border:0;border-top:1px solid #292929;margin:14px 0}.tot{font-size:20px;font-weight:700}.item{border-top:1px solid #292929;padding:12px 0}.item:first-child{border-top:0}
+.pill{display:inline-block;background:#272727;border-radius:999px;padding:4px 8px;font-size:11px;margin:3px 3px 0 0}.thumbs{display:flex;gap:8px;margin:8px 0}.thumbs img{width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #333}
+.hidden{display:none!important}#viewer{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:20;display:flex;align-items:center;justify-content:center;padding:18px}
+#viewer img{max-width:100%;max-height:90%;object-fit:contain}.close{position:absolute;right:14px;top:14px;width:auto}
+.quick{display:flex;gap:6px;overflow:auto;padding-bottom:4px}.quick button{white-space:nowrap;width:auto;min-width:auto}
 </style>
 </head>
 <body>
 <main>
-<h1>🪙 Coin Tracker</h1><div class="sub">Version 8 • safe storage & migration</div>
+<h1>🪙 Coin Tracker</h1><div class="sub">Version 11 • Version 2 recovery</div>
 
-<div id="migrationCard" class="card hidden">
-<h2>Older collection found</h2>
-<div id="migrationText" class="notice">Checking for your previous collection…</div>
-<div class="row" style="margin-top:10px"><button id="migrateBtn" class="primary">Import my old collection</button><button id="backupBtn">Backup current collection</button></div>
-<div id="migrationResult" class="small" style="margin-top:8px"></div>
+<div class="card">
+<h2>Data recovery</h2>
+<div class="notice">Scanning is read-only. It does not delete your old Safari data.</div>
+<div class="row" style="margin-top:10px"><button id="scanOld" class="primary">Scan old Safari data</button><button id="chooseV2">Import Version 2 backup</button></div>
+<input id="backupFile" class="hidden" type="file" accept=".json,application/json,.txt">
+<div id="recoveryStatus" class="small" style="margin-top:8px">Ready. Your Version 2 backup contains 31 listings; use the Version 2 button to restore them.</div>
 </div>
 
 <div class="card">
@@ -36,12 +41,17 @@ hr{border:0;border-top:1px solid #292929;margin:14px 0}
 <div><label>Silver £/troy oz</label><input id="silverPrice" type="number" step="0.01" value="45.20"></div>
 <div><label>Gold £/troy oz</label><input id="goldPrice" type="number" step="0.01" value="3100"></div>
 <div><label>Copper £/kg</label><input id="copperPrice" type="number" step="0.01" value="8.50"></div>
-</div>
-<button id="savePrices" style="margin-top:10px">Save prices</button>
+</div><button id="savePrices" style="margin-top:10px">Save prices</button>
 </div>
 
 <div class="card">
 <h2>Add coin</h2>
+<div class="quick">
+<button onclick="quickCoin('Silver Britannia','Silver','1','oz','0.999')">Silver Britannia</button>
+<button onclick="quickCoin('Silver Eagle','Silver','1','oz','0.999')">Silver Eagle</button>
+<button onclick="quickCoin('Gold Sovereign','Gold','0.2354','oz','0.9167')">Gold Sovereign</button>
+<button onclick="quickCoin('Gold Britannia','Gold','1','oz','0.9999')">Gold Britannia</button>
+</div>
 <div class="grid">
 <div><label>Name / search words</label><input id="name" placeholder="Silver Britannia"></div>
 <div><label>Metal</label><select id="metal"><option>Silver</option><option>Gold</option><option>Copper</option></select></div>
@@ -53,85 +63,128 @@ hr{border:0;border-top:1px solid #292929;margin:14px 0}
 <div><label>Condition</label><input id="condition" placeholder="BU / circulated"></div>
 </div>
 <label>Type</label><select id="type"><option>bullion</option><option>fractional</option><option>graded</option><option>novelty</option><option>historic</option></select>
-<label>Paid £</label><input id="paid" type="number" step="0.01" placeholder="0">
-<div class="grid" style="margin-top:4px"><div><label>Front photo</label><input id="front" type="file" accept="image/*"></div><div><label>Back photo</label><input id="back" type="file" accept="image/*"></div></div>
-<label>Your private sale value £ (optional)</label><input id="yourValue" type="number" step="0.01" placeholder="Leave blank for suggested estimate">
-<button id="add" class="primary" style="margin-top:12px">Save coin</button>
-<div id="status" class="small" style="margin-top:8px"></div>
+<label>Paid £</label><input id="paid" type="number" step="0.01">
+<div class="grid"><div><label>Front photo</label><input id="front" type="file" accept="image/*"></div><div><label>Back photo</label><input id="back" type="file" accept="image/*"></div></div>
+<label>Your private sale value £ (optional)</label><input id="yourValue" type="number" step="0.01">
+<button id="add" class="primary" style="margin-top:12px">Save coin</button><div id="status" class="small" style="margin-top:8px"></div>
 </div>
 
-<div class="card">
-<h2>Collection totals</h2>
-<div id="totals"></div>
-</div>
+<div class="card"><h2>Collection totals</h2><div id="totals"></div></div>
 
 <div class="card">
-<h2>My collection</h2>
-<input id="search" placeholder="Search name, year, mint, metal…">
-<div class="row" style="margin-top:8px">
-<select id="filter"><option>All</option><option>Gold</option><option>Silver</option><option>Copper</option></select>
-<select id="sort"><option value="new">Newest</option><option value="name">Name</option><option value="value">Private sale value</option></select>
-</div>
+<h2>Search my collection</h2>
+<div class="searchrow"><input id="search" placeholder="Type a name, year, mint or metal"><button id="searchBtn">Search</button></div>
+<div class="row" style="margin-top:8px"><select id="filter"><option>All</option><option>Gold</option><option>Silver</option><option>Copper</option></select><button id="clearSearch">Clear search</button><select id="sort"><option value="new">Newest</option><option value="name">Name</option><option value="value">Private sale value</option></select></div>
+<div id="searchStatus" class="small" style="margin-top:8px"></div>
 <div id="list"></div>
 </div>
 
-<div class="card">
-<h2>Backup & restore</h2>
-<div class="row"><button id="export">Save backup to Files</button><button id="importBtn">Restore backup</button></div>
-<input id="importFile" class="hidden" type="file" accept=".json,application/json">
-<div class="small" style="margin-top:8px">Do not clear Safari website data until you have a backup.</div>
-</div>
+<div class="card"><h2>Backup & restore</h2><div class="row"><button id="export">Save backup to Files</button><button id="importBtn">Restore from JSON</button></div>
+<input id="importFile" class="hidden" type="file" accept=".json,application/json,.txt"><div class="small" style="margin-top:8px">Keep a backup in Files/iCloud. Do not clear Safari website data until recovery is complete.</div></div>
 </main>
-
 <div id="viewer" class="hidden"><button class="close" onclick="closeViewer()">Close</button><img id="viewerImg"></div>
 
 <script>
 "use strict";
-const DB="CoinTrackerV8", STORE="coins", DBV=1;
-let items=[];
+const DB="CoinTrackerV10",STORE="coins",DBV=1;let items=[];let searchTerm="";
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function dbOpen(){return new Promise((res,rej)=>{let r=indexedDB.open(DB,DBV);r.onupgradeneeded=()=>{let d=r.result;if(!d.objectStoreNames.contains(STORE)){let s=d.createObjectStore(STORE,{keyPath:"id"});s.createIndex("sourceKey","sourceKey",{unique:false});}};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
-async function all(){let d=await dbOpen();return new Promise((res,rej)=>{let t=d.transaction(STORE,"readonly"),r=t.objectStore(STORE).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);});}
-async function put(x){let d=await dbOpen();return new Promise((res,rej)=>{let t=d.transaction(STORE,"readwrite");t.objectStore(STORE).put(x);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
-async function load(){items=await all();render();}
-function readFile(f){return new Promise((res,rej)=>{if(!f)return res("");let r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(f);});}
-function purityNum(p){let n=parseFloat(p);if(!isFinite(n)||n<=0)return 1;return n>1?n/100:n;}
-function ozFrom(weight,unit){let n=parseFloat(weight)||0;return unit==="oz"?n:unit==="g"?n/31.1034768:n*32.1507466;}
-function fineOz(x){return ozFrom(x.weight,x.unit)*purityNum(x.purity);}
-function melt(x){let p=x.metal==="Gold"?parseFloat($("goldPrice").value)||3100:x.metal==="Copper"?parseFloat($("copperPrice").value)||8.5:parseFloat($("silverPrice").value)||45.2;return x.metal==="Copper"?((parseFloat(x.weight)||0)*(x.unit==="kg"?1:x.unit==="g"?0.001:x.unit==="oz"?0.0311034768:1)*purityNum(x.purity))*p:fineOz(x)*p;}
-function estimate(x){if(x.yourValue!==""&&x.yourValue!=null&&isFinite(+x.yourValue))return +x.yourValue;let m=melt(x),k={bullion:1.12,fractional:1.25,graded:1.28,novelty:1.20,historic:1.18}[x.type]||1.12;return m*k;}
-function range(x){let e=estimate(x);return [Math.max(melt(x),e*.9),e*1.1];}
-function render(){let q=$("search").value.toLowerCase(),f=$("filter").value,s=$("sort").value;
-let a=items.filter(x=>(f==="All"||x.metal===f)&&((x.name+" "+x.year+" "+x.mint+" "+x.condition+" "+x.metal).toLowerCase().includes(q)));
-a.sort((x,y)=>s==="name"?String(x.name).localeCompare(String(y.name)):s==="value"?estimate(y)-estimate(x):(+y.created||0)-(+x.created||0));
-let sums={Gold:[0,0],Silver:[0,0],Copper:[0,0]}, total=0;
-a.forEach(x=>{let m=melt(x),v=estimate(x);sums[x.metal][0]+=m;sums[x.metal][1]+=v;total+=v;});
-$("totals").innerHTML=["Gold","Silver","Copper"].map(m=>`<div><b>${m}</b><div class="tot">Melt £${sums[m][0].toFixed(2)}</div><div class="small">Private sale £${sums[m][1].toFixed(2)}</div></div>`).join("<hr>")+`<div class="tot">Full collection private sale £${total.toFixed(2)}</div>`;
-$("list").innerHTML=a.length?a.map(x=>{let [lo,hi]=range(x);let photos=[x.front,x.back].filter(Boolean);return `<div class="item"><b>${esc(x.name||"Unnamed coin")}</b><div>${esc(x.metal)} • ${esc(x.weight)} ${esc(x.unit)} • ${esc(x.year||"")}</div><div>${esc(x.mint||"")} ${esc(x.condition||"")}</div><span class="pill">Melt £${melt(x).toFixed(2)}</span><span class="pill">Estimate £${lo.toFixed(2)}–£${hi.toFixed(2)}</span>${x.yourValue?`<span class="pill">Your £${(+x.yourValue).toFixed(2)}</span>`:""}<div class="thumbs">${photos.map(p=>`<img src="${p}" onclick="viewPhoto(this.src)">`).join("")}</div><button onclick="removeCoin('${esc(x.id)}')" class="danger">Delete this coin</button></div>`}).join(""):"<div class='small'>No coins found.</div>";
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB,DBV);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE,{keyPath:"id"})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function all(){return openDB().then(d=>new Promise((res,rej)=>{const q=d.transaction(STORE,"readonly").objectStore(STORE).getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>rej(q.error)}))}
+function put(x){return openDB().then(d=>new Promise((res,rej)=>{const t=d.transaction(STORE,"readwrite");t.objectStore(STORE).put(x);t.oncomplete=res;t.onerror=()=>rej(t.error)}))}
+async function load(){items=await all();render()}
+function readFile(f){return new Promise((res,rej)=>{if(!f)return res("");const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(f)})}
+function pnum(v){const n=parseFloat(v);return !isFinite(n)||n<=0?1:n>1?n/100:n}
+function oz(x){const n=parseFloat(x.weight)||0;return x.unit==="oz"?n:x.unit==="g"?n/31.1034768:n*32.1507466}
+function melt(x){const p=x.metal==="Gold"?parseFloat($("goldPrice").value)||3100:x.metal==="Copper"?parseFloat($("copperPrice").value)||8.5:parseFloat($("silverPrice").value)||45.2;if(x.metal==="Copper"){const kg=(+x.weight||0)*(x.unit==="kg"?1:x.unit==="g"?.001:x.unit==="oz"?.0311034768:1);return kg*p}return oz(x)*pnum(x.purity)*p}
+function est(x){if(x.yourValue!==""&&x.yourValue!=null&&isFinite(+x.yourValue))return +x.yourValue;return melt(x)*({bullion:1.12,fractional:1.25,graded:1.28,novelty:1.20,historic:1.18}[x.type]||1.12)}
+function rg(x){const e=est(x);return [Math.max(melt(x),e*.9),e*1.1]}
+function render(){
+ const q=String(searchTerm||"").trim().toLowerCase(), f=$("filter").value, s=$("sort").value;
+ let a=items.filter(x=>{
+   const text=[x.name,x.metal,x.year,x.mint,x.condition,x.type,x.weight,x.unit].map(v=>String(v??"")).join(" ").toLowerCase();
+   return (f==="All"||String(x.metal)===f) && (!q||text.includes(q));
+ });
+ a.sort((x,y)=>s==="name"?String(x.name||"").localeCompare(String(y.name||"")):s==="value"?est(y)-est(x):(+y.created||0)-(+x.created||0));
+ let sm={Gold:[0,0],Silver:[0,0],Copper:[0,0]};items.forEach(x=>{if(sm[x.metal]){sm[x.metal][0]+=melt(x);sm[x.metal][1]+=est(x)}});
+ $("totals").innerHTML=["Gold","Silver","Copper"].map(m=>`<div><b>${m}</b><div class="tot">Melt £${sm[m][0].toFixed(2)}</div><div class="small">Private sale £${sm[m][1].toFixed(2)}</div></div>`).join("<hr>")+`<div class="tot">Full collection private sale £${Object.values(sm).reduce((n,v)=>n+v[1],0).toFixed(2)}</div>`;
+ $("searchStatus").textContent=q?`${a.length} matching coin${a.length===1?"":"s"}`:`${items.length} coin${items.length===1?"":"s"} in collection`;
+ $("list").innerHTML=a.length?a.map(x=>{const [lo,hi]=rg(x),ps=[x.front,x.back].filter(Boolean);return `<div class="item"><b>${esc(x.name||"Unnamed coin")}</b><div>${esc(x.metal)} • ${esc(x.weight)} ${esc(x.unit)} • ${esc(x.year)}</div><div>${esc(x.mint)} ${esc(x.condition)}</div><span class="pill">Melt £${melt(x).toFixed(2)}</span><span class="pill">Estimate £${lo.toFixed(2)}–£${hi.toFixed(2)}</span>${x.yourValue?`<span class="pill">Your £${(+x.yourValue).toFixed(2)}</span>`:""}<div class="thumbs">${ps.map(p=>`<img src="${p}" onclick="viewPhoto(this.src)">`).join("")}</div><button class="danger" onclick="removeCoin('${esc(x.id)}')">Delete this coin</button></div>`}).join(""):"<div class='small'>No matching coins.</div>";
 }
+window.quickCoin=(n,m,w,u,p)=>{$("name").value=n;$("metal").value=m;$("weight").value=w;$("unit").value=u;$("purity").value=p};
 window.viewPhoto=s=>{$("viewerImg").src=s;$("viewer").classList.remove("hidden")};window.closeViewer=()=>{$("viewer").classList.add("hidden");$("viewerImg").src=""};
-window.removeCoin=async id=>{if(!confirm("Delete this coin? This cannot be undone unless you have a backup."))return;let d=await dbOpen();await new Promise((res,rej)=>{let t=d.transaction(STORE,"readwrite");t.objectStore(STORE).delete(id);t.oncomplete=res;t.onerror=()=>rej(t.error)});await load();};
+window.removeCoin=async id=>{if(!confirm("Delete this coin?"))return;const d=await openDB();await new Promise((res,rej)=>{const t=d.transaction(STORE,"readwrite");t.objectStore(STORE).delete(id);t.oncomplete=res;t.onerror=()=>rej(t.error)});await load()};
+$("searchBtn").onclick=()=>{searchTerm=$("search").value;render();$("search").blur()};
+$("search").addEventListener("input",()=>{searchTerm=$("search").value;render()});
+$("search").addEventListener("keydown",e=>{if(e.key==="Enter"){searchTerm=$("search").value;render();$("search").blur()}});
+$("clearSearch").onclick=()=>{$("search").value="";searchTerm="";$("filter").value="All";render()};
+$("filter").onchange=render;$("sort").onchange=render;
+$("add").onclick=async()=>{try{const x={id:"coin-"+Date.now()+"-"+Math.random().toString(36).slice(2),created:Date.now(),name:$("name").value.trim(),metal:$("metal").value,weight:$("weight").value,unit:$("unit").value,purity:pnum($("purity").value||1),year:$("year").value.trim(),mint:$("mint").value.trim(),condition:$("condition").value.trim(),type:$("type").value,paid:$("paid").value||"",yourValue:$("yourValue").value||"",front:await readFile($("front").files[0]),back:await readFile($("back").files[0])};if(!x.name||!(+x.weight>0)){$("status").textContent="Enter a name and weight.";return}await put(x);await load();$("status").textContent="Saved automatically."}catch(e){$("status").textContent="Save error: "+e.message}};
+$("savePrices").onclick=()=>{localStorage.setItem("priceSilver",$("silverPrice").value);localStorage.setItem("priceGold",$("goldPrice").value);localStorage.setItem("priceCopper",$("copperPrice").value);render()};
+for(const k of ["priceSilver","priceGold","priceCopper"]){const v=localStorage.getItem(k);if(v)$(k).value=v}
 
-async function addCoin(){try{let x={id:"coin-"+Date.now()+"-"+Math.random().toString(36).slice(2),created:Date.now(),name:$("name").value.trim(),metal:$("metal").value,weight:$("weight").value,unit:$("unit").value,purity:purityNum($("purity").value||1),year:$("year").value.trim(),mint:$("mint").value.trim(),condition:$("condition").value.trim(),type:$("type").value,paid:$("paid").value||"",yourValue:$("yourValue").value||"",front:await readFile($("front").files[0]),back:await readFile($("back").files[0])};if(!x.name||!(+x.weight>0)){ $("status").textContent="Enter a name and weight.";return}await put(x);items.push(x);render();$("status").textContent="Saved automatically.";document.querySelectorAll("input[type=file]").forEach(e=>e.value="");}catch(e){$("status").textContent="Could not save: "+e.message;}}
-$("add").onclick=addCoin;
-$("savePrices").onclick=()=>{localStorage.setItem("priceSilver",$("silverPrice").value);localStorage.setItem("priceGold",$("goldPrice").value);localStorage.setItem("priceCopper",$("copperPrice").value);render();};
-$("search").oninput=render;$("filter").onchange=render;$("sort").onchange=render;
-["priceSilver","priceGold","priceCopper"].forEach((id,k)=>{let key=["priceSilver","priceGold","priceCopper"][k],v=localStorage.getItem(key);if(v)$(id).value=v;});
-$("export").onclick=async()=>{let data={app:"Coin Tracker",version:8,created:new Date().toISOString(),coins:await all(),prices:{silver:$("silverPrice").value,gold:$("goldPrice").value,copper:$("copperPrice").value}};let blob=new Blob([JSON.stringify(data)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="coin-tracker-backup-"+new Date().toISOString().slice(0,10)+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
-$("importBtn").onclick=()=>$("importFile").click();
-$("importFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let data=JSON.parse(await f.text());if(!Array.isArray(data.coins))throw Error("Not a Coin Tracker backup");for(let x of data.coins){if(!x.id)x.id="restored-"+Date.now()+"-"+Math.random();x.created=x.created||Date.now();await put(x)}if(data.prices){$("silverPrice").value=data.prices.silver||$("silverPrice").value;$("goldPrice").value=data.prices.gold||$("goldPrice").value;$("copperPrice").value=data.prices.copper||$("copperPrice").value}await load();alert("Backup restored. Nothing was deleted.");}catch(e){alert("Restore failed: "+e.message)}e.target.value="";};
-
-function candidate(v){if(!v||typeof v!=="object")return false;let s=JSON.stringify(v).toLowerCase();return /(silver|gold|copper|britannia|eagle|sovereign|coin|bullion|krugerrand|maple|libertad|bar)/.test(s)&&(v.weight!=null||v.name!=null||v.description!=null||v.metal!=null);}
-function getField(v,names){for(let n of names){if(v[n]!=null&&v[n]!=="")return v[n]}return "";}
-async function blobData(v){if(!v)return "";if(typeof v==="string")return v;if(v instanceof Blob)return await readFile(v);return "";}
-function convertRecord(v,sourceKey){let name=getField(v,["name","title","description","label"])||"Imported coin";let metal=getField(v,["metal","material"]);let alltxt=(name+" "+metal).toLowerCase();if(!metal)metal=/gold|sovereign|krugerrand/.test(alltxt)?"Gold":/copper/.test(alltxt)?"Copper":"Silver";else metal=/gold/i.test(metal)?"Gold":/copper/i.test(metal)?"Copper":"Silver";let unit=getField(v,["unit","weightUnit"])||"oz";unit=/kg/i.test(unit)?"kg":/g/i.test(unit)&&!/oz/i.test(unit)?"g":"oz";let p=getField(v,["purity","fineness","fine"]);p=purityNum(p||1);return {id:"migrated-"+btoa(unescape(encodeURIComponent(sourceKey))).replace(/[^a-zA-Z0-9]/g,"").slice(0,35)+"-"+Math.random().toString(36).slice(2),sourceKey,name,metal,weight:getField(v,["weight","mass"])||1,unit,purity:p,year:getField(v,["year","date"])||"",mint:getField(v,["mint","mintMark","mintmark"])||"",condition:getField(v,["condition","grade"])||"",type:getField(v,["type","category"])||"bullion",paid:getField(v,["paid","purchasePrice","cost"])||"",yourValue:getField(v,["yourValue","privateSaleValue","saleValue"])||"",front:getField(v,["front","frontPhoto","photo","image","imageData"])||"",back:getField(v,["back","backPhoto","reversePhoto"])||"",created:Date.now()};}
-async function readOldDB(name){return new Promise(resolve=>{let done=false;try{let r=indexedDB.open(name);r.onupgradeneeded=e=>{e.target.transaction.abort();};r.onsuccess=async()=>{let d=r.result, out=[];try{for(let sn of d.objectStoreNames){let vals=await new Promise((rs,rj)=>{let t=d.transaction(sn,"readonly"),q=t.objectStore(sn).getAll();q.onsuccess=()=>rs(q.result||[]);q.onerror=()=>rj(q.error)});vals.forEach((v,i)=>{if(candidate(v))out.push({db:name,store:sn,key:i,value:v})})}}catch{}try{d.close()}catch{}if(!done){done=true;resolve(out)}};r.onerror=()=>{if(!done){done=true;resolve([])}};setTimeout(()=>{if(!done){done=true;resolve([])}},2500)}catch{resolve([])}});}
-async function discoverOld(){let found=[];for(let k of ["MetalTrackerDB","MetalTracker","CoinTrackerDB","CoinTrackerV3","CoinTrackerV6","CoinTrackerV7","metalTrackerDB","coinTrackerDB"]){let a=await readOldDB(k);found.push(...a)}try{if(indexedDB.databases){let ds=await indexedDB.databases();for(let d of ds){if(d.name&&d.name!==DB){let a=await readOldDB(d.name);found.push(...a)}}}}catch{}let seen=new Set();return found.filter(x=>{let k=x.db+"|"+x.store+"|"+JSON.stringify(x.value);if(seen.has(k))return false;seen.add(k);return true});}
-async function migrate(){ $("migrateBtn").disabled=true;$("migrationResult").textContent="Reading old storage…";try{let found=await discoverOld();let count=0;for(let f of found){let key=f.db+"|"+f.store+"|"+JSON.stringify(f.value);let source=items.find(x=>x.sourceKey===key);if(source)continue;let x=convertRecord(f.value,key);x.front=await blobData(x.front);x.back=await blobData(x.back);await put(x);count++}await load();$("migrationResult").textContent=count?`Imported ${count} old listing(s). Your old storage was not deleted.`:"No readable old listings were found. Your old storage was not changed."; $("migrateBtn").disabled=false;}catch(e){$("migrationResult").textContent="Migration stopped safely: "+e.message;$("migrateBtn").disabled=false}}
-$("migrateBtn").onclick=migrate;$("backupBtn").onclick=()=>$("export").click();
-async function startup(){try{let keys=["metalItems","coinItems","items"];let old=keys.some(k=>localStorage.getItem(k));let dbs=[];try{dbs=await indexedDB.databases?.()||[]}catch{};if(old||dbs.some(d=>d.name&&d.name!==DB)){$("migrationCard").classList.remove("hidden");$("migrationText").textContent="An older collection may still be in Safari storage. Import is read-only and will not erase the old data."}let s=localStorage.getItem("priceSilver"),g=localStorage.getItem("priceGold"),c=localStorage.getItem("priceCopper");if(s)$("silverPrice").value=s;if(g)$("goldPrice").value=g;if(c)$("copperPrice").value=c;await load()}catch(e){$("status").textContent="Startup error: "+e.message}}
-startup();
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js?v=8").catch(()=>{});}
+function coinish(o){if(!o||typeof o!=="object")return false;const s=JSON.stringify(o).toLowerCase();return (o.weight!=null||o.mass!=null||o.name!=null||o.title!=null||o.description!=null)&&(s.includes("silver")||s.includes("gold")||s.includes("copper")||s.includes("coin")||s.includes("bullion")||o.metal!=null)}
+function field(o,n){for(const k of n)if(o&&o[k]!=null&&o[k]!=="")return o[k];return ""}
+function flatten(root){const out=[],seen=new Set();function walk(v,path){if(!v||typeof v!=="object"||seen.has(v))return;seen.add(v);if(Array.isArray(v))v.forEach((x,i)=>{if(coinish(x))out.push({v:x,p:path+"["+i+"]"});walk(x,path+"["+i+"]")});else Object.entries(v).forEach(([k,x])=>walk(x,path+"."+k))}walk(root,"root");return out}
+function norm(o,source){let name=field(o,["name","title","description","label"])||"Imported coin",m=field(o,["metal","material"]),s=(name+" "+m).toLowerCase();m=/gold|sovereign|krugerrand/.test(s)?"Gold":/copper/.test(s)?"Copper":"Silver";let u=field(o,["unit","weightUnit"])||"oz";u=/kg/i.test(u)?"kg":/g/i.test(u)&&!/oz/i.test(u)?"g":"oz";return{id:"recovery-"+Date.now()+"-"+Math.random().toString(36).slice(2),sourceKey:source,created:Date.now(),name,metal:m,weight:field(o,["weight","mass"])||1,unit:u,purity:pnum(field(o,["purity","fineness","fine"])||1),year:field(o,["year","date"])||"",mint:field(o,["mint","mintMark","mintmark"])||"",condition:field(o,["condition","grade"])||"",type:field(o,["type","category"])||"bullion",paid:field(o,["paid","purchasePrice","cost"])||"",yourValue:field(o,["yourValue","privateSaleValue","saleValue"])||"",front:field(o,["front","frontPhoto","photo","image","imageData"])||"",back:field(o,["back","backPhoto","reversePhoto"])||""}}
+function readFileObj(v){if(!v)return Promise.resolve("");if(typeof v==="string")return Promise.resolve(v);return readFile(v)}
+async function importRoot(root,label){let n=0;for(const f of flatten(root)){const src=label+"|"+f.p;if(items.some(x=>x.sourceKey===src))continue;const x=norm(f.v,src);x.front=await readFileObj(x.front);x.back=await readFileObj(x.back);await put(x);n++}await load();return n}
+async function readOldDB(name){return new Promise(resolve=>{let done=false;try{const r=indexedDB.open(name);r.onupgradeneeded=e=>{try{e.target.transaction.abort()}catch{}};r.onsuccess=async()=>{const d=r.result,out=[];try{for(const sn of d.objectStoreNames){const q=await new Promise((res,rej)=>{const x=d.transaction(sn,"readonly").objectStore(sn).getAll();x.onsuccess=()=>res(x.result||[]);x.onerror=()=>rej(x.error)});q.forEach((v,i)=>{if(coinish(v))out.push({v,src:name+"|"+sn+"|"+i})})}}catch{}try{d.close()}catch{}if(!done){done=true;resolve(out)}};r.onerror=()=>{if(!done){done=true;resolve([])}};setTimeout(()=>{if(!done){done=true;resolve([])}},2500)}catch{resolve([])}})}
+async function scan(){const st=$("recoveryStatus");st.textContent="Scanning… old data is not being deleted.";let n=0;for(const k of ["metalItems","coinItems","items","coins","collection","coinCollection"]){const raw=localStorage.getItem(k);if(raw)try{n+=await importRoot(JSON.parse(raw),"localStorage:"+k)}catch{}}try{const dbs=await indexedDB.databases?.()||[];for(const d of dbs)if(d.name&&d.name!==DB)for(const r of await readOldDB(d.name))n+=await importRoot(r.v,r.src)}catch{}st.textContent=n?`Recovered ${n} listing(s). Old storage was left untouched.`:"No readable old listings found. Nothing was deleted."}
+$("scanOld").onclick=async()=>{ $("scanOld").disabled=true;try{await scan()}catch(e){$("recoveryStatus").textContent="Scan stopped safely: "+e.message}$("scanOld").disabled=false};
+async function importV2(file){
+ const text=await file.text();
+ let root;
+ try{root=JSON.parse(text)}catch{throw Error("The selected file is not valid JSON")}
+ if(!root || root.version!==2 || !Array.isArray(root.items))throw Error("This is not the Version 2 Metal Tracker backup");
+ let count=0,photos=0;
+ for(let i=0;i<root.items.length;i++){
+   const o=root.items[i]||{};
+   const source="V2|"+(o.id||i);
+   if(items.some(x=>x.sourceKey===source))continue;
+   let metal=String(o.metal||"silver").toLowerCase();
+   metal=metal==="gold"?"Gold":metal==="copper"?"Copper":"Silver";
+   const x={
+     id:"v2-"+(o.id||Date.now()+"-"+i),
+     sourceKey:source,
+     created:Date.parse(o.date)||Date.now(),
+     name:String(o.name||"Imported coin"),
+     metal,
+     weight:o.weight??1,
+     unit:/kg/i.test(String(o.unit||""))?"kg":/g/i.test(String(o.unit||""))&&!/oz/i.test(String(o.unit||""))?"g":"oz",
+     purity:pnum(o.purity??1),
+     year:"",
+     mint:"",
+     condition:"",
+     type:o.type||"bullion",
+     paid:o.paid??"",
+     yourValue:"",
+     front:typeof o.photo==="string"?o.photo:"",
+     back:""
+   };
+   if(x.front)photos++;
+   await put(x);count++;
+   $("recoveryStatus").textContent=`Restoring Version 2 backup… ${count} of ${root.items.length}`;
+ }
+ await load();
+ return {count,photos,total:root.items.length};
+}
+async function importFile(file){let root;try{root=JSON.parse(await file.text())}catch{throw Error("That file is not JSON")};return importRoot(root,"backupFile")}
+$("chooseV2").onclick=()=>$("backupFile").click();
+$("backupFile").onchange=async e=>{
+ const f=e.target.files[0]; if(!f)return;
+ try{
+   $("recoveryStatus").textContent="Reading Version 2 backup…";
+   const r=await importV2(f);
+   $("recoveryStatus").textContent=`Recovered ${r.count} of ${r.total} Version 2 listings. ${r.photos} photo(s) were restored. Your backup file was not changed.`;
+ }catch(err){
+   $("recoveryStatus").textContent="Version 2 restore stopped safely: "+err.message;
+ }
+ e.target.value="";
+};
+$("export").onclick=async()=>{const data={app:"Coin Tracker",version:10,created:new Date().toISOString(),coins:await all(),prices:{silver:$("silverPrice").value,gold:$("goldPrice").value,copper:$("copperPrice").value}};const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"}));a.download="coin-tracker-backup-"+Date.now()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$("importBtn").onclick=()=>$("importFile").click();$("importFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const n=await importFile(f);alert(n?`Recovered ${n} listing(s).`:"No coin listings found.")}catch(err){alert("Import stopped safely: "+err.message)}e.target.value=""};
+load().catch(e=>$("status").textContent="Database error: "+e.message);
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=10").catch(()=>{});
 </script>
 </body></html>
