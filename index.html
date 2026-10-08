@@ -1,3 +1,506 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b0d10"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-180.png"><title>Coin Tracker</title><style>:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#0b0d10;color:#f4f5f6;font:16px system-ui,-apple-system,sans-serif}main{max-width:640px;margin:auto;padding:16px}.hero{text-align:center}.hero img{width:80px;height:80px;border-radius:18px}.hero h1{margin:8px 0}.muted{color:#aab1bb;font-size:13px}nav{display:flex;gap:7px;position:sticky;top:0;background:#0b0d10;padding:8px 0;z-index:2}button,input,select{width:100%;padding:11px;border-radius:11px;border:1px solid #303640;background:#12161b;color:#fff;font:inherit}button{font-weight:700}.primary{background:#eee;color:#111}.card{background:#15191f;border:1px solid #303640;border-radius:15px;padding:13px;margin:10px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}label{display:block;color:#aab1bb;font-size:12px;margin:9px 0 4px}.gold{color:#dfbb5f}.silver{color:#d2d7df}.copper{color:#c47d45}.metric{background:#0e1217;border:1px solid #303640;border-radius:10px;padding:9px;margin-top:7px}.metric b{display:block;font-size:17px}.item{display:grid;grid-template-columns:90px 1fr;gap:10px}.photos{display:grid;grid-template-columns:1fr 1fr;gap:3px}.photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}.actions{display:flex;gap:6px;margin-top:8px}.hidden{display:none}.range{font-weight:800}.viewer{position:fixed;inset:0;background:#000;z-index:9;display:flex;align-items:center;justify-content:center}.viewer img{max-width:100%;max-height:100%}.viewer button{position:absolute;top:15px;right:15px;width:auto}</style></head><body><main><div id="bootError" class="card hidden" style="border-color:#8b4b4b;color:#ffb4b4">The app could not start. Your saved collection has not been deleted. Reload the page or restore a backup.</div><div class="hero"><img src="icon-180.png"><h1>Coin Tracker</h1><div class="muted">Gold • Silver • Copper</div></div><nav><button data-tab="collection">Collection</button><button data-tab="add">Add Coin</button><button data-tab="prices">Prices & Backup</button></nav><section id="collection"><div class="card"><b>Collection totals</b><div id="totals"></div></div><div class="card"><input id="search" placeholder="Search coins, years, mint marks"><div class="grid3" style="margin-top:8px"><button onclick="setFilter('all')">All</button><button onclick="setFilter('gold')">🥇 Gold</button><button onclick="setFilter('silver')">🥈 Silver</button></div><div class="grid3" style="margin-top:7px"><button onclick="setFilter('copper')">🟤 Copper</button><button onclick="setFilter('bullion')">Bullion</button><button onclick="setFilter('historic')">Historic</button></div></div><div id="items"></div></section><section id="add" class="hidden"><div class="card"><h2 id="formTitle">Add coin</h2><div class="grid"><div><label>Metal</label><select id="metal"><option value="gold">🥇 Gold</option><option value="silver" selected>🥈 Silver</option><option value="copper">🟤 Copper</option></select></div><div><label>Coin / bullion</label><select id="coin"></select></div></div><label>Search / seed words</label><input id="seed" placeholder="e.g. silver britannia 1oz"><div class="grid"><div><label>Weight</label><input id="weight" type="number" step=".0001"></div><div><label>Unit</label><select id="unit"><option>troy oz</option><option>g</option><option>kg</option></select></div></div><div class="grid"><div><label>Purity</label><input id="purity" type="number" step=".0001" value=".999"></div><div><label>Year</label><input id="year"></div></div><div class="grid"><div><label>Mint / mark</label><input id="mint"></div><div><label>Condition</label><select id="condition"><option>Unknown</option><option>Poor</option><option>Fair</option><option>Good</option><option>Very Good</option><option>Fine</option><option>Very Fine</option><option>Extremely Fine</option><option>Uncirculated</option><option>Brilliant Uncirculated</option><option>Proof</option></select></div></div><div class="grid"><div><label>Type</label><select id="type"><option>bullion</option><option>fractional</option><option>graded</option><option>novelty</option><option>historic</option></select></div><div><label>Paid (£)</label><input id="paid" type="number" step=".01"></div></div><label>Your private-sale value (£), optional</label><input id="yourValue" type="number" step=".01"><label>Front photo</label><input id="front" type="file" accept="image/*"><label>Back photo</label><input id="back" type="file" accept="image/*"><div class="metric"><span class="muted">Estimated private sale</span><div id="estimate" class="range">—</div></div><p class="muted">Ballpark estimate. Current metal prices are used for melt value; coin premiums are conservative and are not a guaranteed sale price.</p><button class="primary" onclick="saveItem()">Save coin</button></div></section><section id="prices" class="hidden"><div class="card"><h2>Metal prices</h2><div class="grid"><div><label>Silver £/troy oz</label><input id="ps" type="number" step=".01"></div><div><label>Gold £/troy oz</label><input id="pg" type="number" step=".01"></div></div><label>Copper £/kg</label><input id="pc" type="number" step=".01"><button style="margin-top:8px" onclick="savePrices()">Save prices</button><button style="margin-top:7px" onclick="livePrices()">Try live gold/silver prices</button></div><div class="card"><h2>Backup</h2><button class="primary" onclick="backup()">Export full backup</button><label>Restore backup</label><input id="restore" type="file" accept=".json"><button style="margin-top:7px" onclick="restoreBackup()">Restore</button><p class="muted">Keep backups in iCloud Drive before clearing Safari website data.</p></div></section></main><div id="viewer" class="viewer hidden"><button onclick="closeViewer()">Close</button><img id="viewerImg"></div><script>
-const presets={gold:[['Gold Britannia 1 oz',1,'troy oz',.9999,'bullion'],['Gold Britannia 1/2 oz',.5,'troy oz',.9999,'fractional'],['Gold Britannia 1/4 oz',.25,'troy oz',.9999,'fractional'],['Gold Britannia 1/10 oz',.1,'troy oz',.9999,'fractional'],['Gold Sovereign',7.3224,'g',.9167,'bullion'],['Half Sovereign',3.6612,'g',.9167,'fractional'],['Krugerrand 1 oz',1,'troy oz',.9167,'bullion'],['American Gold Eagle 1 oz',1,'troy oz',.9167,'bullion'],['Canadian Gold Maple Leaf 1 oz',1,'troy oz',.9999,'bullion'],['Australian Gold Kangaroo 1 oz',1,'troy oz',.9999,'bullion'],['Vienna Philharmonic 1 oz',1,'troy oz',.9999,'bullion'],['Gold bar 1 oz',1,'troy oz',.9999,'bullion'],['Other / Custom','','','', 'bullion']],silver:[['Silver Britannia 1 oz',1,'troy oz',.999,'bullion'],['American Silver Eagle 1 oz',1,'troy oz',.999,'bullion'],['Canadian Silver Maple Leaf 1 oz',1,'troy oz',.9999,'bullion'],['Silver Krugerrand 1 oz',1,'troy oz',.999,'bullion'],['Australian Silver Kangaroo 1 oz',1,'troy oz',.9999,'bullion'],['Vienna Philharmonic 1 oz',1,'troy oz',.999,'bullion'],['Silver Panda 1 oz',1,'troy oz',.999,'bullion'],['Morgan Dollar',26.73,'g',.9,'historic'],['Peace Dollar',26.73,'g',.9,'historic'],['UK pre-decimal silver',0,'g',.5,'historic'],['Silver bar 1 oz',1,'troy oz',.999,'bullion'],['Silver round 1 oz',1,'troy oz',.999,'bullion'],['Other / Custom','','','', 'bullion']],copper:[['UK penny',9.45,'g',.97,'historic'],['UK halfpenny',5.67,'g',.97,'historic'],['US Lincoln cent',3.11,'g',.95,'historic'],['Copper round 1 oz',28.3495,'g',.999,'bullion'],['Copper bar 1 kg',1,'kg',.999,'bullion'],['Copper bar 1 lb',453.592,'g',.999,'bullion'],['Other / Custom','','','', 'bullion']]};
-let items=[],prices={gold:3100,silver:45.2,copper:8.5},filter='all',editId=null; try{items=JSON.parse(localStorage.coinTrackerItems||'[]');if(!Array.isArray(items))items=[]}catch(e){items=[]} try{prices={gold:+localStorage.priceGold||3100,silver:+localStorage.priceSilver||45.2,copper:+localStorage.priceCopper||8.5}}catch(e){}const $=id=>document.getElementById(id),money=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(n||0);function grams(i){let w=+i.weight||0;return i.unit==='troy oz'?w*31.1034768:i.unit==='kg'?w*1000:w}function melt(i){let g=grams(i)*(+i.purity||0);return i.metal==='gold'?g/31.1034768*prices.gold:i.metal==='silver'?g/31.1034768*prices.silver:g/1000*prices.copper}function est(i){let m=melt(i),lo=i.metal==='gold'?1.025:i.metal==='silver'?1.1:1.15,hi=i.metal==='gold'?1.1:i.metal==='silver'?1.35:1.6,s=(i.seed||'').toLowerCase();if(/britannia|sovereign|krugerrand|maple|eagle|kangaroo|philharmonic|panda|bar|round/.test(s)){lo+=.02;hi+=.08}if(/morgan|peace|historic|pre-decimal|proof/.test(s)||i.condition==='Proof'||i.condition==='Brilliant Uncirculated'){lo+=.05;hi+=.15}if(i.type==='fractional')hi+=.08;if(i.type==='graded')hi+=.12;return [Math.round(m*lo*100)/100,Math.round(m*hi*100)/100]}function updateChoices(){let a=presets[$('metal').value];$('coin').innerHTML=a.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('');applyPreset()}function applyPreset(){let p=presets[$('metal').value][+$('coin').value];if(!p)return;$('seed').value=p[0];if(p[1]!== '')$('weight').value=p[1];$('unit').value=p[2]||'g';if(p[3]!=='')$('purity').value=p[3];$('type').value=p[4];updateEstimate()}function updateEstimate(){let i={metal:$('metal').value,seed:$('seed').value,weight:$('weight').value,unit:$('unit').value,purity:$('purity').value,type:$('type').value,condition:$('condition').value},e=est(i);$('estimate').textContent=e[0]?`${money(e[0])} – ${money(e[1])}`:'—'}function fileData(f){return new Promise(r=>{if(!f)return r('');let x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)})}async function saveItem(){let old=items.find(x=>x.id===editId),o={id:editId||crypto.randomUUID(),metal:$('metal').value,name:$('seed').value||'Custom coin',seed:$('seed').value,weight:+$('weight').value,unit:$('unit').value,purity:+$('purity').value,year:$('year').value,mint:$('mint').value,condition:$('condition').value,type:$('type').value,paid:+$('paid').value||0,yourValue:+$('yourValue').value||null,front:await fileData($('front').files[0])||old?.front||'',back:await fileData($('back').files[0])||old?.back||'',updated:Date.now()};items=items.filter(x=>x.id!==o.id);items.push(o);persist();editId=null;document.querySelector('[data-tab="collection"]').click();render()}function persist(){localStorage.coinTrackerItems=JSON.stringify(items)}function render(){let d={gold:[0,0,0],silver:[0,0,0],copper:[0,0,0]},all=[0,0,0];items.forEach(i=>{let m=melt(i),e=est(i),lo=i.yourValue||e[0],hi=i.yourValue||e[1];d[i.metal][0]+=m;d[i.metal][1]+=lo;d[i.metal][2]+=hi;all[0]+=m;all[1]+=lo;all[2]+=hi});let b=(n,c,x)=>`<div class="card"><b class="${c}">${n}</b><div class="metric">Melt value <b>${money(x[0])}</b></div><div class="metric">Private sale <b>${money(x[1])} – ${money(x[2])}</b></div></div>`;$('totals').innerHTML=b('🥇 Gold','gold',d.gold)+b('🥈 Silver','silver',d.silver)+b('🟤 Copper','copper',d.copper)+b('💰 Entire collection','',all);renderItems()}function renderItems(){let q=($('search').value||'').toLowerCase();let a=items.filter(i=>(filter==='all'||i.metal===filter||i.type===filter)&&(!q||[i.name,i.seed,i.year,i.mint,i.type,i.condition].join(' ').toLowerCase().includes(q)));$('items').innerHTML=a.map(i=>{let e=est(i),v=i.yourValue?money(i.yourValue):`${money(e[0])} – ${money(e[1])}`;return `<div class="card item"><div class="photos">${i.front?`<img src="${i.front}" onclick="view('${i.front}')">`:'<span>'}</span>${i.back?`<img src="${i.back}" onclick="view('${i.back}')">`:'<span>'}</span></div><div><b>${esc(i.name)}</b><div class="muted">${i.year||''} ${i.mint?'• '+esc(i.mint):''} • ${i.weight||0} ${i.unit}</div><div>Melt: <b>${money(melt(i))}</b></div><div class="range">Private sale: ${v}</div><div class="actions"><button onclick="edit('${i.id}')">Edit</button><button onclick="removeItem('${i.id}')">Delete</button></div></div></div>`}).join('')||'<div class="card muted">No coins found.</div>'}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function setFilter(x){filter=x;renderItems()}function edit(id){let i=items.find(x=>x.id===id);editId=id;document.querySelector('[data-tab="add"]').click();$('metal').value=i.metal;updateChoices();$('seed').value=i.seed;$('weight').value=i.weight;$('unit').value=i.unit;$('purity').value=i.purity;$('year').value=i.year;$('mint').value=i.mint;$('condition').value=i.condition;$('type').value=i.type;$('paid').value=i.paid;$('yourValue').value=i.yourValue||'';$('formTitle').textContent='Edit coin';updateEstimate()}function removeItem(id){if(confirm('Delete this coin?')){items=items.filter(x=>x.id!==id);persist();render()}}function view(s){$('viewerImg').src=s;$('viewer').classList.remove('hidden')}function closeViewer(){$('viewer').classList.add('hidden')}function savePrices(){prices={gold:+$('pg').value||prices.gold,silver:+$('ps').value||prices.silver,copper:+$('pc').value||prices.copper};localStorage.priceGold=prices.gold;localStorage.priceSilver=prices.silver;localStorage.priceCopper=prices.copper;render()}async function livePrices(){try{let r=await fetch('https://api.metals.live/v1/spot');let a=await r.json(),x=a[a.length-1]||{};if(x.gold)prices.gold=x.gold*.75;if(x.silver)prices.silver=x.silver*.75;$('pg').value=prices.gold;$('ps').value=prices.silver;savePrices();alert('Gold/silver prices updated where available.')}catch(e){alert('Live lookup unavailable; saved prices kept.')}}function backup(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({version:4,prices,items})],{type:'application/json'}));a.download='coin-tracker-backup.json';a.click()}async function restoreBackup(){let f=$('restore').files[0];if(!f)return alert('Choose a backup first.');try{let x=JSON.parse(await f.text());if(!Array.isArray(x.items))throw 0;items=x.items;prices=x.prices||prices;persist();localStorage.priceGold=prices.gold;localStorage.priceSilver=prices.silver;localStorage.priceCopper=prices.copper;render();alert('Backup restored.')}catch(e){alert('Invalid Coin Tracker backup.')}}document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));$(b.dataset.tab).classList.remove('hidden')});$('metal').onchange=updateChoices;['seed','weight','unit','purity','condition','type'].forEach(x=>$(x).oninput=updateEstimate);$('coin').onchange=applyPreset;$('search').oninput=renderItems;$('ps').value=prices.silver;$('pg').value=prices.gold;$('pc').value=prices.copper;updateChoices();render();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');</script><script>window.addEventListener("error",function(){var e=document.getElementById("bootError");if(e)e.classList.remove("hidden")});</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>Coin Tracker</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b0d10;color:#f4f5f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:650px;margin:auto;padding:18px 14px 60px}
+header{text-align:center;padding:10px 0 18px}
+header img{width:78px;height:78px;border-radius:18px}
+h1{margin:8px 0 2px;font-size:28px}
+h2{margin:0 0 12px}
+.muted{color:#aeb5bf;font-size:13px}
+nav{display:flex;gap:7px;position:sticky;top:0;z-index:5;padding:7px 0;background:rgba(11,13,16,.96)}
+button,input,select{font:inherit}
+button{border:1px solid #303740;background:#151a20;color:#f4f5f7;border-radius:11px;padding:11px;width:100%;font-weight:700}
+button.primary{background:#f1f3f5;color:#11151a;border-color:#f1f3f5}
+button.danger{border-color:#6c3b3b}
+.tab{flex:1;padding:10px 4px}
+.tab.active{border-color:#7da9ff}
+.card{background:#151a20;border:1px solid #2b323a;border-radius:16px;padding:14px;margin:10px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+label{display:block;color:#aeb5bf;font-size:13px;margin:9px 0 5px}
+input,select{width:100%;padding:11px;border:1px solid #303740;border-radius:10px;background:#0f1318;color:#f4f5f7}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metric{background:#0f1318;border:1px solid #2b323a;border-radius:12px;padding:10px}
+.metric span{display:block;color:#aeb5bf;font-size:12px}
+.metric b{display:block;margin-top:4px;font-size:17px}
+.gold{color:#e0bd63}.silver{color:#d7dde5}.copper{color:#c9844a}
+.item{display:grid;grid-template-columns:92px 1fr;gap:11px}
+.photos{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#080a0d}
+.item h3{margin:0 0 4px;font-size:17px}
+.range{font-weight:800;margin-top:4px}
+.actions{display:flex;gap:7px;margin-top:8px}
+.actions button{padding:9px;font-size:13px}
+.notice{padding:10px;border:1px solid #3a424c;border-radius:11px;color:#c8ced6;font-size:12px;line-height:1.4}
+.hidden{display:none!important}
+.viewer{position:fixed;inset:0;background:#000;z-index:50;display:flex;align-items:center;justify-content:center}
+.viewer img{max-width:100%;max-height:100%;object-fit:contain}
+.viewer button{position:absolute;right:15px;top:15px;width:auto}
+</style>
+</head>
+<body>
+<main>
+<header>
+<img src="./icon-180.png" alt="Coin Tracker">
+<h1>Coin Tracker</h1>
+<div class="muted">Gold • Silver • Copper</div>
+</header>
+
+<nav>
+<button class="tab active" data-page="collection">Collection</button>
+<button class="tab" data-page="add">Add Coin</button>
+<button class="tab" data-page="settings">Prices & Backup</button>
+</nav>
+
+<section id="collectionPage">
+<div class="card">
+<h2>Collection totals</h2>
+<div class="muted">Estimated private-sale ranges are conservative ballparks.</div>
+<div id="totals"></div>
+</div>
+
+<div class="card">
+<input id="search" placeholder="Search coins, years, mint marks..." autocomplete="off">
+<div class="grid3" style="margin-top:9px">
+<button data-filter="all">All</button>
+<button data-filter="gold">🥇 Gold</button>
+<button data-filter="silver">🥈 Silver</button>
+</div>
+<div class="grid3" style="margin-top:8px">
+<button data-filter="copper">🟤 Copper</button>
+<button data-filter="bullion">Bullion</button>
+<button data-filter="historic">Historic</button>
+</div>
+</div>
+
+<div id="items"></div>
+</section>
+
+<section id="addPage" class="hidden">
+<div class="card">
+<h2 id="formTitle">Add coin</h2>
+
+<div class="grid">
+<div>
+<label>Metal</label>
+<select id="metal">
+<option value="gold">🥇 Gold</option>
+<option value="silver" selected>🥈 Silver</option>
+<option value="copper">🟤 Copper</option>
+</select>
+</div>
+<div>
+<label>Coin / bullion</label>
+<select id="coin"></select>
+</div>
+</div>
+
+<label>Seed words / name</label>
+<input id="name" placeholder="e.g. Silver Britannia 1oz">
+
+<div class="grid">
+<div><label>Weight</label><input id="weight" type="number" step="0.0001"></div>
+<div><label>Unit</label><select id="unit"><option>troy oz</option><option>g</option><option>kg</option></select></div>
+</div>
+
+<div class="grid">
+<div><label>Purity</label><input id="purity" type="number" step="0.0001" value="0.999"></div>
+<div><label>Year</label><input id="year" inputmode="numeric" placeholder="Optional"></div>
+</div>
+
+<div class="grid">
+<div><label>Mint / mint mark</label><input id="mint"></div>
+<div><label>Condition</label>
+<select id="condition">
+<option>Unknown</option><option>Poor</option><option>Fair</option><option>Good</option>
+<option>Very Good</option><option>Fine</option><option>Very Fine</option>
+<option>Extremely Fine</option><option>Uncirculated</option><option>Brilliant Uncirculated</option><option>Proof</option>
+</select>
+</div>
+</div>
+
+<div class="grid">
+<div><label>Type</label><select id="type"><option>bullion</option><option>fractional</option><option>graded</option><option>novelty</option><option>historic</option></select></div>
+<div><label>Paid (£)</label><input id="paid" type="number" step="0.01"></div>
+</div>
+
+<label>Your private-sale value (£), optional</label>
+<input id="yourValue" type="number" step="0.01" placeholder="Overrides the automatic range in totals">
+
+<label>Front photo</label>
+<input id="front" type="file" accept="image/*">
+
+<label>Back photo</label>
+<input id="back" type="file" accept="image/*">
+
+<div class="card" style="margin:12px 0 0">
+<div class="muted">Estimated private sale</div>
+<div id="estimate" style="font-size:20px;font-weight:800;margin-top:3px">—</div>
+<div class="muted" style="margin-top:5px">A ballpark estimate based on coin type, metal, weight, purity and condition. It is not a guaranteed selling price.</div>
+</div>
+
+<div class="actions">
+<button class="primary" id="saveBtn">Save coin</button>
+<button id="clearBtn">Clear</button>
+</div>
+</div>
+</section>
+
+<section id="settingsPage" class="hidden">
+<div class="card">
+<h2>Metal prices</h2>
+<div class="grid">
+<div><label>Silver £ / troy oz</label><input id="silverPrice" type="number" step="0.01"></div>
+<div><label>Gold £ / troy oz</label><input id="goldPrice" type="number" step="0.01"></div>
+</div>
+<label>Copper £ / kg</label>
+<input id="copperPrice" type="number" step="0.01">
+<button class="primary" id="savePrices" style="margin-top:10px">Save prices</button>
+<button id="livePrices" style="margin-top:8px">Try live gold & silver prices</button>
+</div>
+
+<div class="card">
+<h2>Backup</h2>
+<button class="primary" id="exportBtn">Export full backup</button>
+<label>Restore a backup</label>
+<input id="restoreFile" type="file" accept=".json,application/json">
+<button id="restoreBtn" style="margin-top:8px">Restore selected backup</button>
+<div class="notice" style="margin-top:10px">Keep a backup in iCloud Drive before clearing Safari website data.</div>
+</div>
+</section>
+</main>
+
+<div id="viewer" class="viewer hidden">
+<button id="closeViewer">Close</button>
+<img id="viewerImage" alt="">
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var presets = {
+gold: [
+["Gold Britannia 1 oz",31.1035,"troy oz",0.9999,"bullion"],
+["Gold Britannia 1/2 oz",15.5518,"troy oz",0.9999,"fractional"],
+["Gold Britannia 1/4 oz",7.7759,"troy oz",0.9999,"fractional"],
+["Gold Britannia 1/10 oz",3.11035,"troy oz",0.9999,"fractional"],
+["Gold Sovereign",7.3224,"g",0.9167,"bullion"],
+["Half Sovereign",3.6612,"g",0.9167,"fractional"],
+["Krugerrand 1 oz",31.1035,"troy oz",0.9167,"bullion"],
+["American Gold Eagle 1 oz",31.1035,"troy oz",0.9167,"bullion"],
+["Canadian Gold Maple Leaf 1 oz",31.1035,"troy oz",0.9999,"bullion"],
+["Australian Gold Kangaroo 1 oz",31.1035,"troy oz",0.9999,"bullion"],
+["Vienna Philharmonic 1 oz",31.1035,"troy oz",0.9999,"bullion"],
+["Gold bar 1 oz",31.1035,"troy oz",0.9999,"bullion"],
+["Other / Custom","","","","bullion"]
+],
+silver: [
+["Silver Britannia 1 oz",31.1035,"troy oz",0.999,"bullion"],
+["Silver Britannia 1/2 oz",15.5518,"g",0.999,"fractional"],
+["Silver Britannia 1/4 oz",7.7759,"g",0.999,"fractional"],
+["American Silver Eagle 1 oz",31.1035,"troy oz",0.999,"bullion"],
+["Canadian Silver Maple Leaf 1 oz",31.1035,"troy oz",0.9999,"bullion"],
+["Silver Krugerrand 1 oz",31.1035,"troy oz",0.999,"bullion"],
+["Australian Silver Kangaroo 1 oz",31.1035,"troy oz",0.9999,"bullion"],
+["Vienna Philharmonic 1 oz",31.1035,"troy oz",0.999,"bullion"],
+["Silver Panda 1 oz",31.1035,"troy oz",0.999,"bullion"],
+["Morgan Dollar",26.73,"g",0.9,"historic"],
+["Peace Dollar",26.73,"g",0.9,"historic"],
+["UK pre-decimal silver",0,"g",0.5,"historic"],
+["Silver bar 1 oz",31.1035,"troy oz",0.999,"bullion"],
+["Silver round 1 oz",31.1035,"troy oz",0.999,"bullion"],
+["Other / Custom","","","","bullion"]
+],
+copper: [
+["UK penny",9.45,"g",0.97,"historic"],
+["UK halfpenny",5.67,"g",0.97,"historic"],
+["US Lincoln cent",3.11,"g",0.95,"historic"],
+["Copper round 1 oz",28.3495,"g",0.999,"bullion"],
+["Copper bar 1 kg",1,"kg",0.999,"bullion"],
+["Copper bar 1 lb",453.592,"g",0.999,"bullion"],
+["Other / Custom","","","","bullion"]
+]
+};
+
+var prices = {gold:3100, silver:45.20, copper:8.50};
+var items = [];
+var editingId = null;
+var filter = "all";
+var db = null;
+
+function $(id){return document.getElementById(id);}
+function money(n){return new Intl.NumberFormat("en-GB",{style:"currency",currency:"GBP"}).format(Number(n)||0);}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+
+function openDB(){
+ return new Promise(function(resolve,reject){
+  var req=indexedDB.open("CoinTrackerV6",1);
+  req.onupgradeneeded=function(){req.result.createObjectStore("items",{keyPath:"id"});};
+  req.onsuccess=function(){db=req.result;resolve();};
+  req.onerror=function(){reject(req.error);};
+ });
+}
+function getAll(){
+ return new Promise(function(resolve,reject){
+  var arr=[], req=db.transaction("items").objectStore("items").openCursor();
+  req.onsuccess=function(e){var c=e.target.result;if(c){arr.push(c.value);c.continue();}else resolve(arr);};
+  req.onerror=function(){reject(req.error);};
+ });
+}
+function putItem(o){
+ return new Promise(function(resolve,reject){
+  var req=db.transaction("items","readwrite").objectStore("items").put(o);
+  req.onsuccess=function(){resolve();}; req.onerror=function(){reject(req.error);};
+ });
+}
+function deleteItem(id){
+ return new Promise(function(resolve,reject){
+  var req=db.transaction("items","readwrite").objectStore("items").delete(id);
+  req.onsuccess=function(){resolve();}; req.onerror=function(){reject(req.error);};
+ });
+}
+function uid(){return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2);}
+
+function loadPrices(){
+ prices.gold=Number(localStorage.getItem("coinGoldPrice"))||3100;
+ prices.silver=Number(localStorage.getItem("coinSilverPrice"))||45.20;
+ prices.copper=Number(localStorage.getItem("coinCopperPrice"))||8.50;
+ $("goldPrice").value=prices.gold;
+ $("silverPrice").value=prices.silver;
+ $("copperPrice").value=prices.copper;
+}
+function savePrices(){
+ prices.gold=Number($("goldPrice").value)||prices.gold;
+ prices.silver=Number($("silverPrice").value)||prices.silver;
+ prices.copper=Number($("copperPrice").value)||prices.copper;
+ localStorage.setItem("coinGoldPrice",prices.gold);
+ localStorage.setItem("coinSilverPrice",prices.silver);
+ localStorage.setItem("coinCopperPrice",prices.copper);
+ render();
+ alert("Prices saved.");
+}
+
+function fillCoins(){
+ var metal=$("metal").value;
+ $("coin").innerHTML="";
+ presets[metal].forEach(function(p,i){
+  var opt=document.createElement("option");
+  opt.value=i; opt.textContent=p[0]; $("coin").appendChild(opt);
+ });
+ applyPreset();
+}
+function applyPreset(){
+ var p=presets[$("metal").value][Number($("coin").value)];
+ if(!p)return;
+ $("name").value=p[0];
+ if(p[1] !== "") $("weight").value=p[1];
+ if(p[2]) $("unit").value=p[2];
+ if(p[3] !== "") $("purity").value=p[3];
+ $("type").value=p[4];
+ updateEstimate();
+}
+
+function grams(weight,unit){
+ weight=Number(weight)||0;
+ if(unit==="troy oz")return weight*31.1034768;
+ if(unit==="kg")return weight*1000;
+ return weight;
+}
+function meltValue(o){
+ var fine=grams(o.weight,o.unit)*(Number(o.purity)||0);
+ if(o.metal==="gold")return fine/31.1034768*prices.gold;
+ if(o.metal==="silver")return fine/31.1034768*prices.silver;
+ return fine/1000*prices.copper;
+}
+function estimateRange(o){
+ var m=meltValue(o); if(!m)return [0,0];
+ var low=1.02, high=1.10;
+ if(o.metal==="silver"){low=1.10;high=1.35;}
+ if(o.metal==="copper"){low=1.15;high=1.60;}
+ var s=(o.name||"").toLowerCase();
+ if(/britannia|sovereign|krugerrand|maple|eagle|kangaroo|philharmonic|panda|bar|round/.test(s)){low+=.02;high+=.08;}
+ if(/morgan|peace|historic|pre-decimal/.test(s)){low+=.05;high+=.15;}
+ if(o.type==="fractional")high+=.08;
+ if(o.type==="graded")high+=.12;
+ if(o.condition==="Proof"||o.condition==="Brilliant Uncirculated")high+=.15;
+ if(o.condition==="Poor"||o.condition==="Fair")high=Math.max(low,high-.05);
+ return [Math.round(m*low*100)/100,Math.round(m*high*100)/100];
+}
+function formObject(){
+ return {
+  id:editingId||uid(),
+  metal:$("metal").value,
+  name:$("name").value.trim()||"Custom coin",
+  weight:Number($("weight").value)||0,
+  unit:$("unit").value,
+  purity:Number($("purity").value)||0,
+  year:$("year").value.trim(),
+  mint:$("mint").value.trim(),
+  condition:$("condition").value,
+  type:$("type").value,
+  paid:Number($("paid").value)||0,
+  yourValue:$("yourValue").value===""?null:Number($("yourValue").value),
+  updated:Date.now()
+ };
+}
+function readImage(file){
+ return new Promise(function(resolve){
+  if(!file){resolve("");return;}
+  var r=new FileReader();
+  r.onload=function(){resolve(r.result);};
+  r.onerror=function(){resolve("");};
+  r.readAsDataURL(file);
+ });
+}
+function updateEstimate(){
+ var o=formObject(), e=estimateRange(o);
+ $("estimate").textContent=e[0] ? money(e[0])+" – "+money(e[1]) : "—";
+}
+
+async function saveCoin(){
+ try{
+  var o=formObject();
+  var old=items.find(function(x){return x.id===o.id;});
+  o.front=await readImage($("front").files[0]) || (old?old.front:"");
+  o.back=await readImage($("back").files[0]) || (old?old.back:"");
+  await putItem(o);
+  items=await getAll();
+  clearForm();
+  showPage("collection");
+  render();
+ }catch(e){alert("The coin could not be saved. Please try again.");}
+}
+function clearForm(){
+ editingId=null;
+ $("formTitle").textContent="Add coin";
+ $("name").value="";$("weight").value="";$("year").value="";$("mint").value="";
+ $("paid").value="";$("yourValue").value="";$("front").value="";$("back").value="";
+ $("purity").value=".999";$("condition").value="Unknown";$("type").value="bullion";
+ $("metal").value="silver";fillCoins();
+}
+async function editCoin(id){
+ var o=items.find(function(x){return x.id===id;}); if(!o)return;
+ editingId=id; showPage("add");
+ $("formTitle").textContent="Edit coin";
+ $("metal").value=o.metal; fillCoins();
+ $("name").value=o.name;$("weight").value=o.weight;$("unit").value=o.unit;$("purity").value=o.purity;
+ $("year").value=o.year||"";$("mint").value=o.mint||"";$("condition").value=o.condition||"Unknown";
+ $("type").value=o.type||"bullion";$("paid").value=o.paid||"";$("yourValue").value=o.yourValue==null?"":o.yourValue;
+ updateEstimate();
+}
+async function removeCoin(id){
+ if(!confirm("Delete this coin?"))return;
+ await deleteItem(id); items=await getAll(); render();
+}
+
+function totalsHtml(){
+ var d={gold:{m:0,l:0,h:0},silver:{m:0,l:0,h:0},copper:{m:0,l:0,h:0}}, all={m:0,l:0,h:0};
+ items.forEach(function(o){
+  var m=meltValue(o),e=estimateRange(o);
+  d[o.metal].m+=m; d[o.metal].l+=o.yourValue==null?e[0]:o.yourValue; d[o.metal].h+=o.yourValue==null?e[1]:o.yourValue;
+  all.m+=m; all.l+=o.yourValue==null?e[0]:o.yourValue; all.h+=o.yourValue==null?e[1]:o.yourValue;
+ });
+ function block(title,cls,x){
+  return '<div class="card"><h2 class="'+cls+'">'+title+'</h2><div class="summary"><div class="metric"><span>Melt value</span><b>'+money(x.m)+'</b></div><div class="metric"><span>Private sale</span><b>'+money(x.l)+' – '+money(x.h)+'</b></div></div></div>';
+ }
+ return block("🥇 Gold","gold",d.gold)+block("🥈 Silver","silver",d.silver)+block("🟤 Copper","copper",d.copper)+block("💰 Entire collection","",all);
+}
+function matches(o){
+ var q=$("search").value.trim().toLowerCase();
+ var text=[o.name,o.year,o.mint,o.type,o.condition,o.metal].join(" ").toLowerCase();
+ return (!q||text.indexOf(q)!==-1) && (filter==="all"||o.metal===filter||o.type===filter);
+}
+function itemsHtml(){
+ var arr=items.filter(matches).sort(function(a,b){return b.updated-a.updated;});
+ if(!arr.length)return '<div class="card muted">No coins match your search.</div>';
+ return arr.map(function(o){
+  var e=estimateRange(o), m=meltValue(o), p=o.yourValue==null?money(e[0])+" – "+money(e[1]):money(o.yourValue);
+  var photos=(o.front||o.back)?'<div class="photos">'+(o.front?'<img src="'+o.front+'" data-photo="'+o.id+'-f">':'<div></div>')+(o.back?'<img src="'+o.back+'" data-photo="'+o.id+'-b">':'<div></div>')+'</div>':'<div></div>';
+  return '<div class="card item">'+photos+'<div><h3>'+esc(o.name)+'</h3><div class="muted">'+esc(o.year||"")+" "+(o.mint?"• "+esc(o.mint):"")+" • "+esc(o.weight)+" "+esc(o.unit)+" • "+(Number(o.purity)*100).toFixed(2)+"%</div><div style="margin-top:6px">Melt: <b>"+money(m)+"</b></div><div class="range">Private sale: "+p+"</div><div class="muted">'+(o.yourValue==null?"Automatic estimate":"Your value")+" • "+esc(o.condition)+"</div><div class="actions"><button data-edit="'+o.id+'">Edit</button><button class="danger" data-delete="'+o.id+'">Delete</button></div></div></div>';
+ }).join("");
+}
+function render(){
+ $("totals").innerHTML=totalsHtml();
+ $("items").innerHTML=itemsHtml();
+ document.querySelectorAll("[data-edit]").forEach(function(b){b.onclick=function(){editCoin(b.dataset.edit);};});
+ document.querySelectorAll("[data-delete]").forEach(function(b){b.onclick=function(){removeCoin(b.dataset.delete);};});
+ document.querySelectorAll("[data-photo]").forEach(function(img){
+  img.onclick=function(){
+   var id=img.dataset.photo.slice(0,-2), side=img.dataset.photo.slice(-1), o=items.find(function(x){return x.id===id;});
+   if(o){$("viewerImage").src=side==="f"?o.front:o.back;$("viewer").classList.remove("hidden");}
+  };
+ });
+}
+function showPage(page){
+ document.querySelectorAll(".tab").forEach(function(b){b.classList.toggle("active",b.dataset.page===page);});
+ $("collectionPage").classList.toggle("hidden",page!=="collection");
+ $("addPage").classList.toggle("hidden",page!=="add");
+ $("settingsPage").classList.toggle("hidden",page!=="settings");
+}
+function backup(){
+ var blob=new Blob([JSON.stringify({version:6,exported:new Date().toISOString(),prices:prices,items:items})],{type:"application/json"});
+ var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="coin-tracker-backup.json";a.click();
+ setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+}
+async function restore(){
+ var f=$("restoreFile").files[0]; if(!f){alert("Choose a backup file first.");return;}
+ try{
+  var x=JSON.parse(await f.text());
+  if(!Array.isArray(x.items))throw new Error("bad");
+  for(var i=0;i<x.items.length;i++){if(!x.items[i].id)x.items[i].id=uid();await putItem(x.items[i]);}
+  items=await getAll();
+  if(x.prices){prices=x.prices;localStorage.setItem("coinGoldPrice",prices.gold);localStorage.setItem("coinSilverPrice",prices.silver);localStorage.setItem("coinCopperPrice",prices.copper);}
+  $("goldPrice").value=prices.gold;$("silverPrice").value=prices.silver;$("copperPrice").value=prices.copper;
+  render();alert("Backup restored.");
+ }catch(e){alert("That does not look like a valid Coin Tracker backup.");}
+}
+async function livePrices(){
+ try{
+  var r=await fetch("https://api.metals.live/v1/spot");
+  var data=await r.json(), last=data[data.length-1]||{};
+  if(last.gold)prices.gold=Number(last.gold)*0.75;
+  if(last.silver)prices.silver=Number(last.silver)*0.75;
+  $("goldPrice").value=prices.gold;$("silverPrice").value=prices.silver;
+  savePrices();alert("Live gold/silver prices updated where available.");
+ }catch(e){alert("Live pricing is unavailable right now. Your saved prices have been kept.");}
+}
+
+document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){showPage(b.dataset.page);};});
+document.querySelectorAll("[data-filter]").forEach(function(b){b.onclick=function(){filter=b.dataset.filter;render();};});
+$("search").addEventListener("input",render);
+$("metal").addEventListener("change",fillCoins);
+["name","weight","unit","purity","year","mint","condition","type"].forEach(function(id){$(id).addEventListener("input",updateEstimate);$(id).addEventListener("change",updateEstimate);});
+$("coin").addEventListener("change",applyPreset);
+$("saveBtn").onclick=saveCoin;
+$("clearBtn").onclick=clearForm;
+$("savePrices").onclick=savePrices;
+$("livePrices").onclick=livePrices;
+$("exportBtn").onclick=backup;
+$("restoreBtn").onclick=restore;
+$("closeViewer").onclick=function(){$("viewer").classList.add("hidden");$("viewerImage").src="";};
+
+(async function(){
+ try{
+  loadPrices();
+  await openDB();
+  items=await getAll();
+  fillCoins();
+  render();
+ }catch(e){
+  document.body.innerHTML='<main><div class="card"><h1>Coin Tracker</h1><p>Startup error. Please reload the page.</p><p class="muted">Your existing backup and browser data have not been deleted.</p></div></main>';
+ }
+})();
+})();
+</script>
+</body>
+</html>
