@@ -1,7 +1,7 @@
 {
   "name": "Coin Tracker",
   "short_name": "Coin Tracker",
-  "start_url": "./?v=11",
+  "start_url": "./?v=13",
   "display": "standalone",
   "background_color": "#090909",
   "theme_color": "#090909",
