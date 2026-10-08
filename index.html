@@ -20,12 +20,12 @@ hr{border:0;border-top:1px solid #292929;margin:14px 0}.tot{font-size:20px;font-
 .pill{display:inline-block;background:#272727;border-radius:999px;padding:4px 8px;font-size:11px;margin:3px 3px 0 0}.thumbs{display:flex;gap:8px;margin:8px 0}.thumbs img{width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #333}
 .hidden{display:none!important}#viewer{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:20;display:flex;align-items:center;justify-content:center;padding:18px}
 #viewer img{max-width:100%;max-height:90%;object-fit:contain}.close{position:absolute;right:14px;top:14px;width:auto}
-.sectionHead{margin-top:8px}.sectionHead h3{font-size:20px;border-bottom:1px solid #333;padding-bottom:6px}.quick{display:flex;gap:6px;overflow:auto;padding-bottom:4px}.quick button{white-space:nowrap;width:auto;min-width:auto}.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#0e0e0e;border:1px solid #292929;border-radius:12px;padding:10px}.stat b{display:block;font-size:16px}.good{color:#8fd18f}.warn{color:#e6c97c}.mini{font-size:11px;color:#999}.source{font-size:11px;color:#aaa;margin-top:3px}
+.sectionHead{margin-top:8px}.sectionHead h3{font-size:20px;border-bottom:1px solid #333;padding-bottom:6px}.quick{display:flex;gap:6px;overflow:auto;padding-bottom:4px}.quick button{white-space:nowrap;width:auto;min-width:auto}.guide{background:#101010;border:1px solid #292929;border-radius:12px;padding:10px}.estimate{font-size:18px;font-weight:700}.confidence{font-size:11px;color:#aaa}
 </style>
 </head>
 <body>
 <main>
-<h1>🪙 Coin Tracker</h1><div class="sub">Version 13 • Live market valuation build</div>
+<h1>🪙 Coin Tracker</h1><div class="sub">Version 14 • Coin catalogue & resale guide</div>
 
 <div class="card">
 <h2>Data recovery</h2>
@@ -36,30 +36,27 @@ hr{border:0;border-top:1px solid #292929;margin:14px 0}.tot{font-size:20px;font-
 </div>
 
 <div class="card">
-<h2>Live market</h2>
-<div class="statgrid">
-<div class="stat"><span class="small">Silver</span><b id="liveSilver">£45.20/oz</b><span id="liveSilverMeta" class="mini">Manual price</span></div>
-<div class="stat"><span class="small">Gold</span><b id="liveGold">£3,100.00/oz</b><span id="liveGoldMeta" class="mini">Manual price</span></div>
-<div class="stat"><span class="small">Copper</span><b id="liveCopper">£8.50/kg</b><span id="liveCopperMeta" class="mini">Manual price</span></div>
-<div class="stat"><span class="small">Market status</span><b id="marketStatus">Not connected</b><span class="mini">No silent fake prices</span></div>
-</div>
-<div class="grid" style="margin-top:10px">
-<div><label>Silver £/troy oz fallback</label><input id="silverPrice" type="number" step="0.01" value="45.20"></div>
-<div><label>Gold £/troy oz fallback</label><input id="goldPrice" type="number" step="0.01" value="3100"></div>
-<div><label>Copper £/kg fallback</label><input id="copperPrice" type="number" step="0.01" value="8.50"></div>
-</div>
-<div class="row" style="margin-top:10px"><button id="refreshMarket" class="primary">Refresh live prices</button><button id="savePrices">Save fallback prices</button></div>
-<div id="marketHelp" class="small" style="margin-top:8px">Connect the secure market proxy in Settings below. Until then the saved fallback prices are used.</div>
+<h2>Metal prices</h2>
+<div class="grid">
+<div><label>Silver £/troy oz</label><input id="silverPrice" type="number" step="0.01" value="45.20"></div>
+<div><label>Gold £/troy oz</label><input id="goldPrice" type="number" step="0.01" value="3100"></div>
+<div><label>Copper £/kg</label><input id="copperPrice" type="number" step="0.01" value="8.50"></div>
+</div><button id="savePrices" style="margin-top:10px">Save prices</button>
 </div>
 
 <div class="card">
 <h2>Add coin</h2>
-<div class="quick">
-<button onclick="quickCoin('Silver Britannia','Silver','1','oz','0.999')">Silver Britannia</button>
-<button onclick="quickCoin('Silver Eagle','Silver','1','oz','0.999')">Silver Eagle</button>
-<button onclick="quickCoin('Gold Sovereign','Gold','0.2354','oz','0.9167')">Gold Sovereign</button>
-<button onclick="quickCoin('Gold Britannia','Gold','1','oz','0.9999')">Gold Britannia</button>
-</div>
+<label>Coin / bullion catalogue</label>
+<select id="catalogue">
+<option value="">Choose a common coin or bullion…</option>
+<optgroup label="Gold — UK"><option value="gold_britannia_1oz">Gold Britannia — 1 oz</option><option value="gold_britannia_half">Gold Britannia — ½ oz</option><option value="gold_britannia_quarter">Gold Britannia — ¼ oz</option><option value="gold_britannia_tenth">Gold Britannia — ¹⁄₁₀ oz</option><option value="gold_sovereign">Gold Sovereign</option><option value="gold_half_sovereign">Gold Half Sovereign</option><option value="gold_double_sovereign">Gold Double Sovereign</option></optgroup>
+<optgroup label="Gold — World"><option value="gold_krugerrand_1oz">Krugerrand — 1 oz</option><option value="gold_maple_1oz">Maple Leaf — 1 oz</option><option value="gold_eagle_1oz">American Gold Eagle — 1 oz</option><option value="gold_buffalo_1oz">American Gold Buffalo — 1 oz</option><option value="gold_kangaroo_1oz">Australian Kangaroo — 1 oz</option><option value="gold_philharmonic_1oz">Vienna Philharmonic — 1 oz</option><option value="gold_panda_30g">Chinese Panda — 30 g</option><option value="gold_50peso">Mexican 50 Pesos</option></optgroup>
+<optgroup label="Silver — UK"><option value="silver_britannia_1oz">Silver Britannia — 1 oz</option><option value="silver_britannia_2oz">Silver Britannia — 2 oz</option><option value="silver_britannia_10oz">Silver Britannia — 10 oz</option><option value="silver_britannia_1kg">Silver Britannia — 1 kg</option></optgroup>
+<optgroup label="Silver — World"><option value="silver_eagle_1oz">American Silver Eagle — 1 oz</option><option value="silver_maple_1oz">Silver Maple Leaf — 1 oz</option><option value="silver_krugerrand_1oz">Silver Krugerrand — 1 oz</option><option value="silver_philharmonic_1oz">Silver Philharmonic — 1 oz</option><option value="silver_kangaroo_1oz">Silver Kangaroo — 1 oz</option><option value="silver_kookaburra_1oz">Silver Kookaburra — 1 oz</option><option value="silver_koala_1oz">Silver Koala — 1 oz</option><option value="silver_libertad_1oz">Mexican Libertad — 1 oz</option><option value="silver_panda">Chinese Panda</option><option value="silver_noahs_ark_1oz">Noah's Ark — 1 oz</option><option value="silver_elephant_1oz">Somali Elephant — 1 oz</option><option value="silver_morgan">Morgan Dollar</option><option value="silver_peace">Peace Dollar</option></optgroup>
+<optgroup label="Copper"><option value="copper_round_1oz">Copper Round — 1 oz</option><option value="copper_bar_1oz">Copper Bar — 1 oz</option><option value="copper_bar_1lb">Copper Bar — 1 lb</option><option value="copper_britannia_1oz">Copper Britannia-style Round — 1 oz</option><option value="copper_other">Other Copper</option></optgroup>
+<optgroup label="Bars"><option value="gold_bar_1oz">Gold Bar — 1 oz</option><option value="gold_bar_50g">Gold Bar — 50 g</option><option value="gold_bar_100g">Gold Bar — 100 g</option><option value="silver_bar_1oz">Silver Bar — 1 oz</option><option value="silver_bar_10oz">Silver Bar — 10 oz</option><option value="silver_bar_1kg">Silver Bar — 1 kg</option></optgroup>
+<option value="custom">Other / custom coin</option></select>
+<div id="catalogueNote" class="small" style="margin-top:6px">Choose a catalogue item to auto-fill metal, weight, purity and type.</div>
 <div class="grid">
 <div><label>Name / search words</label><input id="name" placeholder="Silver Britannia"></div>
 <div><label>Metal</label><select id="metal"><option>Silver</option><option>Gold</option><option>Copper</option></select></div>
@@ -77,48 +74,14 @@ hr{border:0;border-top:1px solid #292929;margin:14px 0}.tot{font-size:20px;font-
 <div class="row" style="margin-top:12px"><button id="add" class="primary">Save coin</button><button id="cancelEdit" class="hidden">Cancel edit</button></div><div id="status" class="small" style="margin-top:8px"></div>
 </div>
 
-<div class="card"><h2>Collection totals</h2><div id="totals"></div></div>
+<div class="card"><h2>Private resale estimate</h2><div class="notice">Guide ranges are indicative, not guaranteed sale prices. Year, mint mark, proof/graded status, scarcity and condition can change value materially.</div><div id="currentEstimate" class="guide"><div class="small">Choose a coin and enter its year for a more specific estimate.</div></div><div class="small" style="margin-top:8px">Guide snapshot: 8 Oct 2026. Based on current UK bullion/dealer references and Numista valuation guidance.</div></div><div class="card"><h2>Collection totals</h2><div id="totals"></div></div>
 
-<div class="card" id="collectionCard">
+<div class="card">
 <h2>Search my collection</h2>
 <div class="searchrow"><input id="search" placeholder="Type a name, year, mint or metal"><button id="searchBtn">Search</button></div>
 <div class="row" style="margin-top:8px"><select id="filter"><option>All</option><option>Gold</option><option>Silver</option><option>Copper</option></select><button id="clearSearch">Clear search</button><select id="sort"><option value="new">Newest</option><option value="name">Name</option><option value="value">Private sale value</option></select></div>
 <div id="searchStatus" class="small" style="margin-top:8px"></div>
 <div id="list"></div>
-</div>
-
-<div class="card">
-<h2>Valuation</h2>
-<div class="notice">Private-sale estimates are ranges, not guaranteed selling prices. Live coin-market data is only used when a coin is successfully matched to a market record.</div>
-<div id="valuationSummary" style="margin-top:10px"></div>
-</div>
-
-<div class="card">
-<h2>Live coin market</h2>
-<div class="small">Use each coin's name, year, mint and metal to search the connected Numista catalogue. The app stores the Numista ID and your valuation fields; catalogue data is refreshed rather than copied into your collection.</div>
-<div class="row" style="margin-top:10px"><button id="refreshValuations" class="primary">Refresh matched estimates</button><button id="clearMarketMatches">Clear market matches</button></div>
-<div id="valuationStatus" class="small" style="margin-top:8px">No live coin-market refresh has been run.</div>
-</div>
-
-<div class="card">
-<h2>Settings & connections</h2>
-<label>Secure market proxy URL</label>
-<input id="proxyUrl" placeholder="https://your-worker.example.workers.dev">
-<div class="small" style="margin-top:5px">Recommended for a public GitHub Pages site. Keep API keys on the proxy server, not in this website.</div>
-<label>Optional Metals.Dev API key (device only)</label>
-<input id="metalsKey" type="password" placeholder="Only for personal testing">
-<div class="small" style="margin-top:5px">Stored only in this browser. A secure proxy is safer for the public site.</div>
-<div class="row" style="margin-top:10px"><button id="saveSettings" class="primary">Save connection settings</button><button id="testConnection">Test connection</button></div>
-<div id="settingsStatus" class="small" style="margin-top:8px"></div>
-<hr>
-<div class="small"><b>Numista:</b> its API provides catalogue search, type details and sales records. Credentials must remain confidential and Numista requires attribution and N# identifiers when its data is displayed.</div>
-</div>
-
-<div class="card">
-<h2>Useful subsections</h2>
-<div class="row"><button onclick="focusSection('collectionTools')">Collection tools</button><button onclick="focusSection('valuationTools')">Valuation tools</button></div>
-<div id="collectionTools" class="small" style="margin-top:10px">• Search by name, year, mint, condition, metal or weight<br>• Gold / Silver / Copper grouping<br>• Edit without losing existing photos<br>• Sort by newest, name or estimated value<br>• Automatic local saving in IndexedDB</div>
-<div id="valuationTools" class="small hidden" style="margin-top:10px">• Melt value from current metal price<br>• Live-market range when a Numista match has sales data<br>• Transparent fallback range when no market match exists<br>• Your own sale value can override the suggested range</div>
 </div>
 
 <div class="card"><h2>Backup & restore</h2><div class="row"><button id="export">Save backup to Files</button><button id="importBtn">Restore from JSON</button></div>
@@ -128,17 +91,8 @@ hr{border:0;border-top:1px solid #292929;margin:14px 0}.tot{font-size:20px;font-
 
 <script>
 "use strict";
-const DB="CoinTrackerV13",STORE="coins",DBV=1;let items=[];let searchTerm="";let editingId=null;
+const DB="CoinTrackerV14",STORE="coins",DBV=1;let items=[];let searchTerm="";let editingId=null;
 const $=id=>document.getElementById(id);
-const SETTINGS_KEY="CoinTrackerV13Settings";
-let liveMarket={silver:null,gold:null,copper:null,updated:null,source:"fallback"};
-function settings(){try{return JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}")}catch{return {}}}
-function saveSettings(){const s={proxyUrl:$("proxyUrl").value.trim().replace(/\/$/,""),metalsKey:$("metalsKey").value.trim()};localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));return s}
-function loadSettings(){const s=settings();$("proxyUrl").value=s.proxyUrl||"";$("metalsKey").value=s.metalsKey||""}
-function fmtGBP(n){return "£"+(Number(n)||0).toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2})}
-function fmtTime(v){if(!v)return "";try{return new Date(v).toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"})}catch{return ""}}
-function focusSection(id){$(id)?.scrollIntoView({behavior:"smooth",block:"start"})}
-window.focusSection=focusSection;
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB,DBV);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE,{keyPath:"id"})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 function all(){return openDB().then(d=>new Promise((res,rej)=>{const q=d.transaction(STORE,"readonly").objectStore(STORE).getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>rej(q.error)}))}
@@ -147,12 +101,13 @@ async function load(){items=await all();render()}
 function readFile(f){return new Promise((res,rej)=>{if(!f)return res("");const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(f)})}
 function pnum(v){const n=parseFloat(v);return !isFinite(n)||n<=0?1:n>1?n/100:n}
 function oz(x){const n=parseFloat(x.weight)||0;return x.unit==="oz"?n:x.unit==="g"?n/31.1034768:n*32.1507466}
-function metalPrice(m){if(m==="Gold")return liveMarket.gold??(parseFloat($("goldPrice").value)||3100);if(m==="Copper")return liveMarket.copper??(parseFloat($("copperPrice").value)||8.5);return liveMarket.silver??(parseFloat($("silverPrice").value)||45.2)}
-function melt(x){const p=metalPrice(x.metal);if(x.metal==="Copper"){const kg=(+x.weight||0)*(x.unit==="kg"?1:x.unit==="g"?.001:x.unit==="oz"?.0311034768:1);return kg*p}return oz(x)*pnum(x.purity)*p}
-function heuristicRange(x){const m=melt(x);const n=String(x.name||"").toLowerCase();const t=String(x.type||"").toLowerCase();let premium={bullion:.16,fractional:.28,graded:.38,novelty:.12,historic:.32}[t]??.16;if(/britannia|eagle|maple|philharmonic|krugerrand|kangaroo|libertad|panda/.test(n))premium+=.08;if(/proof|pf|pr/.test(n+" "+String(x.condition||"").toLowerCase()))premium+=.12;if(/graded|ms ?6[5-9]|pf ?6[5-9]/.test(n+" "+String(x.condition||"").toLowerCase()))premium+=.15;if(x.metal==="Copper")premium=Math.max(premium,.35);const mid=m*(1+premium);return {low:Math.max(m,mid*.88),high:mid*1.12,mid,source:"Heuristic estimate",confidence:"Low"}}
-function marketRange(x){if(isFinite(+x.marketLow)&&isFinite(+x.marketHigh)&&+x.marketLow>0&&+x.marketHigh>=+x.marketLow)return {low:+x.marketLow,high:+x.marketHigh,mid:isFinite(+x.marketMid)?+x.marketMid:(+x.marketLow + +x.marketHigh)/2,source:x.marketSource||"Live market",confidence:x.marketConfidence||"Medium"};return heuristicRange(x)}
-function est(x){if(x.yourValue!==""&&x.yourValue!=null&&isFinite(+x.yourValue))return +x.yourValue;return marketRange(x).mid}
-function rg(x){const r=marketRange(x);if(x.yourValue!==""&&x.yourValue!=null&&isFinite(+x.yourValue)){const e=+x.yourValue;return [e,e]}return [r.low,r.high]}
+function melt(x){const p=x.metal==="Gold"?parseFloat($("goldPrice").value)||3100:x.metal==="Copper"?parseFloat($("copperPrice").value)||8.5:parseFloat($("silverPrice").value)||45.2;if(x.metal==="Copper"){const kg=(+x.weight||0)*(x.unit==="kg"?1:x.unit==="g"?.001:x.unit==="oz"?.0311034768:1);return kg*p}return oz(x)*pnum(x.purity)*p}
+const RESALE_GUIDE={gold_britannia_1oz:[3250,3380],gold_britannia_half:[1640,1710],gold_britannia_quarter:[830,870],gold_britannia_tenth:[340,365],gold_sovereign:[765,825],gold_half_sovereign:[385,430],gold_double_sovereign:[1535,1640],gold_krugerrand_1oz:[3200,3350],gold_maple_1oz:[3200,3370],gold_eagle_1oz:[3230,3400],gold_buffalo_1oz:[3270,3450],gold_kangaroo_1oz:[3210,3370],gold_philharmonic_1oz:[3200,3350],gold_panda_30g:[3250,3500],gold_50peso:[1900,2050],silver_britannia_1oz:[55,68],silver_britannia_2oz:[105,135],silver_britannia_10oz:[520,640],silver_britannia_1kg:[1500,1750],silver_eagle_1oz:[52,68],silver_maple_1oz:[50,64],silver_krugerrand_1oz:[50,64],silver_philharmonic_1oz:[49,63],silver_kangaroo_1oz:[50,65],silver_kookaburra_1oz:[55,78],silver_koala_1oz:[54,76],silver_libertad_1oz:[60,85],silver_panda:[58,90],silver_noahs_ark_1oz:[52,70],silver_elephant_1oz:[52,70],silver_morgan:[45,95],silver_peace:[45,90],copper_round_1oz:[2.5,6],copper_bar_1oz:[2.5,6],copper_bar_1lb:[12,28],copper_britannia_1oz:[3,8],copper_other:[1.5,8],gold_bar_1oz:[3170,3330],gold_bar_50g:[5000,5200],gold_bar_100g:[9950,10300],silver_bar_1oz:[48,62],silver_bar_10oz:[485,590],silver_bar_1kg:[1500,1700]};
+const YEAR_MODS={silver_britannia_1oz:{1997:1.35,1998:1.35,2017:1.08,2020:1.08,2021:1.06,2022:1.04,2023:1.03,2024:1.03,2025:1.02},gold_sovereign:{1902:1.15,1911:1.18,1937:1.30,1953:1.30,2002:1.08,2005:1.08,2012:1.10,2022:1.06,2023:1.03,2024:1.03,2025:1.02},silver_eagle_1oz:{1986:1.20,1996:1.20,2013:1.06,2021:1.05,2022:1.04,2023:1.03,2024:1.03,2025:1.02},silver_maple_1oz:{1988:1.12,1996:1.15,2018:1.05,2020:1.04,2021:1.03,2022:1.03,2023:1.02,2024:1.02,2025:1.01},silver_kookaburra_1oz:{1990:1.15,1991:1.12,2010:1.08,2011:1.08,2020:1.05,2021:1.04,2022:1.03,2023:1.02,2024:1.02,2025:1.01}};
+function guideKey(x){if(x.catalogue&&RESALE_GUIDE[x.catalogue])return x.catalogue;const n=String(x.name||'').toLowerCase(),m=x.metal,w=String(x.weight);if(/britannia/.test(n)&&m==='Silver')return w==='1'&&x.unit==='oz'?'silver_britannia_1oz':w==='2'?'silver_britannia_2oz':w==='10'?'silver_britannia_10oz':x.unit==='kg'?'silver_britannia_1kg':null;if(/britannia/.test(n)&&m==='Gold')return w==='1'?'gold_britannia_1oz':null;if(/sovereign/.test(n)&&m==='Gold')return /half/.test(n)?'gold_half_sovereign':/double/.test(n)?'gold_double_sovereign':'gold_sovereign';if(/eagle/.test(n)&&m==='Silver')return 'silver_eagle_1oz';if(/maple/.test(n)&&m==='Silver')return 'silver_maple_1oz';if(/kookaburra/.test(n))return 'silver_kookaburra_1oz';if(/koala/.test(n))return 'silver_koala_1oz';if(/krugerrand/.test(n))return m==='Gold'?'gold_krugerrand_1oz':'silver_krugerrand_1oz';if(/philharmonic/.test(n))return m==='Gold'?'gold_philharmonic_1oz':'silver_philharmonic_1oz';if(/kangaroo/.test(n))return m==='Gold'?'gold_kangaroo_1oz':'silver_kangaroo_1oz';if(/libertad/.test(n))return 'silver_libertad_1oz';if(/panda/.test(n))return m==='Gold'?'gold_panda_30g':'silver_panda';if(/morgan/.test(n))return 'silver_morgan';if(/peace/.test(n))return 'silver_peace';if(/gold.*bar/.test(n))return /50/.test(n)?'gold_bar_50g':/100/.test(n)?'gold_bar_100g':'gold_bar_1oz';if(/silver.*bar/.test(n))return /kg|1000/.test(n)?'silver_bar_1kg':/10/.test(n)?'silver_bar_10oz':'silver_bar_1oz';if(m==='Copper')return /1 ?lb/.test(n)?'copper_bar_1lb':/bar/.test(n)?'copper_bar_1oz':'copper_round_1oz';return null}
+function guideRange(x){const k=guideKey(x),b=RESALE_GUIDE[k];if(!b)return null;let f=1,y=parseInt(x.year,10);if(YEAR_MODS[k]&&YEAR_MODS[k][y])f*=YEAR_MODS[k][y];const c=String(x.condition||'').toLowerCase();if(/proof|pf/.test(c))f*=1.25;if(/graded|ms ?6[5-9]|pf ?6[5-9]/.test(c))f*=1.30;return {low:b[0]*f,high:b[1]*f,key:k,confidence:(YEAR_MODS[k]&&YEAR_MODS[k][y])?'Medium':'Low'}}
+function est(x){if(x.yourValue!==""&&x.yourValue!=null&&isFinite(+x.yourValue))return +x.yourValue;const r=guideRange(x);if(r)return (r.low+r.high)/2;return melt(x)*({bullion:1.12,fractional:1.25,graded:1.28,novelty:1.20,historic:1.18}[x.type]||1.12)}
+function rg(x){if(x.yourValue!==""&&x.yourValue!=null&&isFinite(+x.yourValue)){const e=+x.yourValue;return [e,e]}const r=guideRange(x);if(r)return [r.low,r.high];const e=melt(x)*({bullion:1.12,fractional:1.25,graded:1.28,novelty:1.20,historic:1.18}[x.type]||1.12);return [Math.max(melt(x),e*.9),e*1.1]}
 function render(){
  const q=String(searchTerm||"").trim().toLowerCase(), f=$("filter").value, s=$("sort").value;
  let a=items.filter(x=>{
@@ -162,7 +117,7 @@ function render(){
  a.sort((x,y)=>s==="name"?String(x.name||"").localeCompare(String(y.name||"")):s==="value"?est(y)-est(x):(+y.created||0)-(+x.created||0));
  let sm={Gold:[0,0],Silver:[0,0],Copper:[0,0]};
  items.forEach(x=>{if(sm[x.metal]){sm[x.metal][0]+=melt(x);sm[x.metal][1]+=est(x)}});
- $("totals").innerHTML=["Gold","Silver","Copper"].map(m=>`<div><b>${m}</b><div class="tot">Melt ${fmtGBP(sm[m][0])}</div><div class="small">Private sale ${fmtGBP(sm[m][1])}</div></div>`).join("<hr>")+`<div class="tot">Full collection private sale ${fmtGBP(Object.values(sm).reduce((n,v)=>n+v[1],0))}</div>`;
+ $("totals").innerHTML=["Gold","Silver","Copper"].map(m=>`<div><b>${m}</b><div class="tot">Melt £${sm[m][0].toFixed(2)}</div><div class="small">Private sale £${sm[m][1].toFixed(2)}</div></div>`).join("<hr>")+`<div class="tot">Full collection private sale £${Object.values(sm).reduce((n,v)=>n+v[1],0).toFixed(2)}</div>`;
  $("searchStatus").textContent=q?`${a.length} matching coin${a.length===1?"":"s"}`:`${items.length} coin${items.length===1?"":"s"} in collection`;
 
  const groups=["Gold","Silver","Copper"];
@@ -174,7 +129,7 @@ function render(){
        <div>${esc(x.metal)} • ${esc(x.weight)} ${esc(x.unit)} • ${esc(x.year)}</div>
        <div>${esc(x.mint)} ${esc(x.condition)}</div>
        <span class="pill">Melt £${melt(x).toFixed(2)}</span>
-       <span class="pill">Private sale ${fmtGBP(lo)}–${fmtGBP(hi)}</span><div class="source">${esc(marketRange(x).source)}${marketRange(x).confidence?` • ${esc(marketRange(x).confidence)} confidence`:""}${x.marketUpdated?` • ${esc(fmtTime(x.marketUpdated))}`:""}</div>
+       <span class="pill">Private sale £${lo.toFixed(2)}–£${hi.toFixed(2)}</span>
        ${x.yourValue?`<span class="pill">Your £${(+x.yourValue).toFixed(2)}</span>`:""}
        <div class="thumbs">${ps.map(p=>`<img src="${p}" onclick="viewPhoto(this.src)">`).join("")}</div>
        <div class="row"><button onclick="editCoin('${esc(x.id)}')">Edit listing</button><button class="danger" onclick="removeCoin('${esc(x.id)}')">Delete</button></div>
@@ -184,6 +139,10 @@ function render(){
  }).join("");
 }
 window.quickCoin=(n,m,w,u,p)=>{$("name").value=n;$("metal").value=m;$("weight").value=w;$("unit").value=u;$("purity").value=p};
+const CATALOGUE={gold_britannia_1oz:["Gold Britannia","Gold","1","oz","0.9999","bullion"],gold_britannia_half:["Gold Britannia 1/2 oz","Gold","0.5","oz","0.9999","fractional"],gold_britannia_quarter:["Gold Britannia 1/4 oz","Gold","0.25","oz","0.9999","fractional"],gold_britannia_tenth:["Gold Britannia 1/10 oz","Gold","0.1","oz","0.9999","fractional"],gold_sovereign:["Gold Sovereign","Gold","0.2354","oz","0.9167","bullion"],gold_half_sovereign:["Gold Half Sovereign","Gold","0.1177","oz","0.9167","fractional"],gold_double_sovereign:["Gold Double Sovereign","Gold","0.4708","oz","0.9167","bullion"],gold_krugerrand_1oz:["Gold Krugerrand","Gold","1","oz","0.9167","bullion"],gold_maple_1oz:["Gold Maple Leaf","Gold","1","oz","0.9999","bullion"],gold_eagle_1oz:["American Gold Eagle","Gold","1","oz","0.9167","bullion"],gold_buffalo_1oz:["American Gold Buffalo","Gold","1","oz","0.9999","bullion"],gold_kangaroo_1oz:["Gold Kangaroo","Gold","1","oz","0.9999","bullion"],gold_philharmonic_1oz:["Gold Philharmonic","Gold","1","oz","0.9999","bullion"],gold_panda_30g:["Gold Panda","Gold","30","g","0.999","bullion"],gold_50peso:["Mexican Gold 50 Pesos","Gold","37.5","g","0.900","bullion"],silver_britannia_1oz:["Silver Britannia","Silver","1","oz","0.999","bullion"],silver_britannia_2oz:["Silver Britannia 2 oz","Silver","2","oz","0.999","bullion"],silver_britannia_10oz:["Silver Britannia 10 oz","Silver","10","oz","0.999","bullion"],silver_britannia_1kg:["Silver Britannia 1 kg","Silver","1","kg","0.999","bullion"],silver_eagle_1oz:["American Silver Eagle","Silver","1","oz","0.999","bullion"],silver_maple_1oz:["Silver Maple Leaf","Silver","1","oz","0.9999","bullion"],silver_krugerrand_1oz:["Silver Krugerrand","Silver","1","oz","0.999","bullion"],silver_philharmonic_1oz:["Silver Philharmonic","Silver","1","oz","0.999","bullion"],silver_kangaroo_1oz:["Silver Kangaroo","Silver","1","oz","0.999","bullion"],silver_kookaburra_1oz:["Silver Kookaburra","Silver","1","oz","0.999","bullion"],silver_koala_1oz:["Silver Koala","Silver","1","oz","0.999","bullion"],silver_libertad_1oz:["Silver Libertad","Silver","1","oz","0.999","bullion"],silver_panda:["Silver Panda","Silver","30","g","0.999","bullion"],silver_noahs_ark_1oz:["Noah's Ark Silver","Silver","1","oz","0.999","bullion"],silver_elephant_1oz:["Somali Elephant","Silver","1","oz","0.999","bullion"],silver_morgan:["Morgan Dollar","Silver","0.77344","oz","0.900","historic"],silver_peace:["Peace Dollar","Silver","0.77344","oz","0.900","historic"],copper_round_1oz:["Copper Round","Copper","1","oz","1","bullion"],copper_bar_1oz:["Copper Bar 1 oz","Copper","1","oz","1","bullion"],copper_bar_1lb:["Copper Bar 1 lb","Copper","1","lb","1","bullion"],copper_britannia_1oz:["Copper Britannia-style Round","Copper","1","oz","1","bullion"],copper_other:["Other Copper","Copper","1","kg","1","novelty"],gold_bar_1oz:["Gold Bar 1 oz","Gold","1","oz","0.9999","bullion"],gold_bar_50g:["Gold Bar 50 g","Gold","50","g","0.9999","bullion"],gold_bar_100g:["Gold Bar 100 g","Gold","100","g","0.9999","bullion"],silver_bar_1oz:["Silver Bar 1 oz","Silver","1","oz","0.999","bullion"],silver_bar_10oz:["Silver Bar 10 oz","Silver","10","oz","0.999","bullion"],silver_bar_1kg:["Silver Bar 1 kg","Silver","1","kg","0.999","bullion"]};
+function applyCatalogue(k){if(!k||k==="custom")return;const v=CATALOGUE[k];if(!v)return;["name","metal","weight","unit","purity","type"].forEach((id,i)=>$(id).value=v[i]);$("catalogueNote").textContent=`Preset applied: ${v[0]}. Add the year and condition for a more specific resale estimate.`;showEstimatePreview()}
+function showEstimatePreview(){const x={name:$("name").value,metal:$("metal").value,weight:$("weight").value,unit:$("unit").value,purity:$("purity").value,year:$("year").value,condition:$("condition").value,type:$("type").value,yourValue:$("yourValue").value,catalogue:$("catalogue").value};const r=rg(x),g=guideRange(x);$("currentEstimate").innerHTML=`<div class="small">Suggested private-sale range</div><div class="estimate">£${r[0].toFixed(2)}–£${r[1].toFixed(2)}</div><div class="confidence">${g?"Coin guide • "+g.confidence+" confidence":"General metal/type estimate"}</div>`}
+$("catalogue").onchange=e=>applyCatalogue(e.target.value);["name","metal","weight","unit","purity","year","condition","type","yourValue"].forEach(id=>$(id).addEventListener("input",showEstimatePreview));
 window.viewPhoto=s=>{$("viewerImg").src=s;$("viewer").classList.remove("hidden")};window.closeViewer=()=>{$("viewer").classList.add("hidden");$("viewerImg").src=""};
 window.removeCoin=async id=>{if(!confirm("Delete this coin?"))return;const d=await openDB();await new Promise((res,rej)=>{const t=d.transaction(STORE,"readwrite");t.objectStore(STORE).delete(id);t.oncomplete=res;t.onerror=()=>rej(t.error)});await load()};
 
@@ -191,7 +150,7 @@ function fillForm(x){
  $("name").value=x.name||"";$("metal").value=x.metal||"Silver";$("weight").value=x.weight??"";
  $("unit").value=x.unit||"oz";$("purity").value=x.purity??1;$("year").value=x.year||"";
  $("mint").value=x.mint||"";$("condition").value=x.condition||"";$("type").value=x.type||"bullion";
- $("paid").value=x.paid??"";$("yourValue").value=x.yourValue??"";
+ $("paid").value=x.paid??"";$("yourValue").value=x.yourValue??"";$("catalogue").value=x.catalogue||"";
  $("status").textContent="Editing "+(x.name||"listing")+" — photos are kept unless you replace them.";
  $("cancelEdit").classList.remove("hidden");$("add").textContent="Update listing";editingId=x.id;
  window.scrollTo({top:0,behavior:"smooth"});
@@ -209,13 +168,14 @@ $("add").onclick=async()=>{
    const old=editingId?items.find(v=>v.id===editingId):null;
    const frontFile=$("front").files[0],backFile=$("back").files[0];
    const x={
+     catalogue:$("catalogue").value||old?.catalogue||"",
      id:old?old.id:"coin-"+Date.now()+"-"+Math.random().toString(36).slice(2),
      sourceKey:old?.sourceKey||"",
      created:old?.created||Date.now(),
      name:$("name").value.trim(),metal:$("metal").value,weight:$("weight").value,unit:$("unit").value,
      purity:pnum($("purity").value||1),year:$("year").value.trim(),mint:$("mint").value.trim(),
      condition:$("condition").value.trim(),type:$("type").value,paid:$("paid").value||"",
-     yourValue:$("yourValue").value||"",numistaId:old?.numistaId||"",marketLow:old?.marketLow||"",marketHigh:old?.marketHigh||"",marketMid:old?.marketMid||"",marketSource:old?.marketSource||"",marketUpdated:old?.marketUpdated||"",marketConfidence:old?.marketConfidence||"",front:frontFile?await readFile(frontFile):(old?.front||""),back:backFile?await readFile(backFile):(old?.back||"")
+     yourValue:$("yourValue").value||"",front:frontFile?await readFile(frontFile):(old?.front||""),back:backFile?await readFile(backFile):(old?.back||"")
    };
    if(!x.name||!(+x.weight>0)){$("status").textContent="Enter a name and weight.";return}
    await put(x);editingId=null;await load();
@@ -230,7 +190,7 @@ for(const k of ["priceSilver","priceGold","priceCopper"]){const v=localStorage.g
 function coinish(o){if(!o||typeof o!=="object")return false;const s=JSON.stringify(o).toLowerCase();return (o.weight!=null||o.mass!=null||o.name!=null||o.title!=null||o.description!=null)&&(s.includes("silver")||s.includes("gold")||s.includes("copper")||s.includes("coin")||s.includes("bullion")||o.metal!=null)}
 function field(o,n){for(const k of n)if(o&&o[k]!=null&&o[k]!=="")return o[k];return ""}
 function flatten(root){const out=[],seen=new Set();function walk(v,path){if(!v||typeof v!=="object"||seen.has(v))return;seen.add(v);if(Array.isArray(v))v.forEach((x,i)=>{if(coinish(x))out.push({v:x,p:path+"["+i+"]"});walk(x,path+"["+i+"]")});else Object.entries(v).forEach(([k,x])=>walk(x,path+"."+k))}walk(root,"root");return out}
-function norm(o,source){let name=field(o,["name","title","description","label"])||"Imported coin",m=field(o,["metal","material"]),s=(name+" "+m).toLowerCase();m=/gold|sovereign|krugerrand/.test(s)?"Gold":/copper/.test(s)?"Copper":"Silver";let u=field(o,["unit","weightUnit"])||"oz";u=/kg/i.test(u)?"kg":/g/i.test(u)&&!/oz/i.test(u)?"g":"oz";return{id:"recovery-"+Date.now()+"-"+Math.random().toString(36).slice(2),sourceKey:source,created:Date.now(),name,metal:m,weight:field(o,["weight","mass"])||1,unit:u,purity:pnum(field(o,["purity","fineness","fine"])||1),year:field(o,["year","date"])||"",mint:field(o,["mint","mintMark","mintmark"])||"",condition:field(o,["condition","grade"])||"",type:field(o,["type","category"])||"bullion",paid:field(o,["paid","purchasePrice","cost"])||"",yourValue:field(o,["yourValue","privateSaleValue","saleValue"])||"",numistaId:field(o,["numistaId","numista","N"])||"",marketLow:field(o,["marketLow"])||"",marketHigh:field(o,["marketHigh"])||"",marketMid:field(o,["marketMid"])||"",marketSource:field(o,["marketSource"])||"",marketUpdated:field(o,["marketUpdated"])||"",marketConfidence:field(o,["marketConfidence"])||"",front:field(o,["front","frontPhoto","photo","image","imageData"])||"",back:field(o,["back","backPhoto","reversePhoto"])||""}}
+function norm(o,source){let name=field(o,["name","title","description","label"])||"Imported coin",m=field(o,["metal","material"]),s=(name+" "+m).toLowerCase();m=/gold|sovereign|krugerrand/.test(s)?"Gold":/copper/.test(s)?"Copper":"Silver";let u=field(o,["unit","weightUnit"])||"oz";u=/kg/i.test(u)?"kg":/g/i.test(u)&&!/oz/i.test(u)?"g":"oz";return{id:"recovery-"+Date.now()+"-"+Math.random().toString(36).slice(2),sourceKey:source,created:Date.now(),name,metal:m,weight:field(o,["weight","mass"])||1,unit:u,purity:pnum(field(o,["purity","fineness","fine"])||1),year:field(o,["year","date"])||"",mint:field(o,["mint","mintMark","mintmark"])||"",condition:field(o,["condition","grade"])||"",type:field(o,["type","category"])||"bullion",paid:field(o,["paid","purchasePrice","cost"])||"",yourValue:field(o,["yourValue","privateSaleValue","saleValue"])||"",catalogue:field(o,["catalogue","preset","coinPreset"])||"",front:field(o,["front","frontPhoto","photo","image","imageData"])||"",back:field(o,["back","backPhoto","reversePhoto"])||""}}
 function readFileObj(v){if(!v)return Promise.resolve("");if(typeof v==="string")return Promise.resolve(v);return readFile(v)}
 async function importRoot(root,label){let n=0;for(const f of flatten(root)){const src=label+"|"+f.p;if(items.some(x=>x.sourceKey===src))continue;const x=norm(f.v,src);x.front=await readFileObj(x.front);x.back=await readFileObj(x.back);await put(x);n++}await load();return n}
 async function readOldDB(name){return new Promise(resolve=>{let done=false;try{const r=indexedDB.open(name);r.onupgradeneeded=e=>{try{e.target.transaction.abort()}catch{}};r.onsuccess=async()=>{const d=r.result,out=[];try{for(const sn of d.objectStoreNames){const q=await new Promise((res,rej)=>{const x=d.transaction(sn,"readonly").objectStore(sn).getAll();x.onsuccess=()=>res(x.result||[]);x.onerror=()=>rej(x.error)});q.forEach((v,i)=>{if(coinish(v))out.push({v,src:name+"|"+sn+"|"+i})})}}catch{}try{d.close()}catch{}if(!done){done=true;resolve(out)}};r.onerror=()=>{if(!done){done=true;resolve([])}};setTimeout(()=>{if(!done){done=true;resolve([])}},2500)}catch{resolve([])}})}
@@ -249,6 +209,7 @@ async function importV2(file){
    let metal=String(o.metal||"silver").toLowerCase();
    metal=metal==="gold"?"Gold":metal==="copper"?"Copper":"Silver";
    const x={
+     catalogue:$("catalogue").value||old?.catalogue||"",
      id:"v2-"+(o.id||Date.now()+"-"+i),
      sourceKey:source,
      created:Date.parse(o.date)||Date.now(),
@@ -262,7 +223,7 @@ async function importV2(file){
      condition:"",
      type:o.type||"bullion",
      paid:o.paid??"",
-     yourValue:"",numistaId:"",marketLow:"",marketHigh:"",marketMid:"",marketSource:"",marketUpdated:"",marketConfidence:"",
+     yourValue:"",catalogue:"",
      front:typeof o.photo==="string"?o.photo:"",
      back:""
    };
@@ -286,32 +247,12 @@ $("backupFile").onchange=async e=>{
  }
  e.target.value="";
 };
-$("export").onclick=async()=>{const data={app:"Coin Tracker",version:13,created:new Date().toISOString(),coins:await all(),prices:{silver:$("silverPrice").value,gold:$("goldPrice").value,copper:$("copperPrice").value}};const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"}));a.download="coin-tracker-backup-"+Date.now()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$("export").onclick=async()=>{const data={app:"Coin Tracker",version:14,created:new Date().toISOString(),coins:await all(),prices:{silver:$("silverPrice").value,gold:$("goldPrice").value,copper:$("copperPrice").value}};const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"}));a.download="coin-tracker-backup-"+Date.now()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $("importBtn").onclick=()=>$("importFile").click();$("importFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const n=await importFile(f);alert(n?`Recovered ${n} listing(s).`:"No coin listings found.")}catch(err){alert("Import stopped safely: "+err.message)}e.target.value=""};
 
-async function readDBItems(name){return new Promise(resolve=>{let done=false;try{const r=indexedDB.open(name);r.onupgradeneeded=e=>{try{e.target.transaction.abort()}catch{}};r.onsuccess=async()=>{const d=r.result,out=[];try{if(d.objectStoreNames.contains("coins")){const q=await new Promise((res,rej)=>{const x=d.transaction("coins","readonly").objectStore("coins").getAll();x.onsuccess=()=>res(x.result||[]);x.onerror=()=>rej(x.error)});q.forEach(v=>out.push(v))}}catch{}try{d.close()}catch{}if(!done){done=true;resolve(out)}};r.onerror=()=>{if(!done){done=true;resolve([])}};setTimeout(()=>{if(!done){done=true;resolve([])}},2500)}catch{resolve([])}})}
-async function migrateOld(){let total=0;for(const name of ["CoinTrackerV12","CoinTrackerV10"]){const oldItems=await readDBItems(name);for(const x of oldItems){const now=await all();if(!now.some(y=>y.id===x.id)){await put({...x,numistaId:x.numistaId||"",marketLow:x.marketLow||"",marketHigh:x.marketHigh||"",marketMid:x.marketMid||"",marketSource:x.marketSource||"",marketUpdated:x.marketUpdated||"",marketConfidence:x.marketConfidence||""});total++}}}return total}
+async function migrateOld(){let n=0;for(const name of ["CoinTrackerV13","CoinTrackerV12","CoinTrackerV10"]){try{const oldDB=await new Promise((res,rej)=>{const r=indexedDB.open(name);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onupgradeneeded=e=>{try{e.target.transaction.abort()}catch{}}});if(!oldDB.objectStoreNames.contains("coins")){oldDB.close();continue}const oldItems=await new Promise((res,rej)=>{const q=oldDB.transaction("coins","readonly").objectStore("coins").getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>rej(q.error)});oldDB.close();for(const x of oldItems){if(!(await all()).some(y=>y.id===x.id)){await put({...x,catalogue:x.catalogue||""});n++}}}catch{}}return n}
 
-async function fetchJson(url,opts={}){const r=await fetch(url,{...opts,headers:{"Accept":"application/json",...(opts.headers||{})}});if(!r.ok)throw Error("HTTP "+r.status);return r.json()}
-function proxyBase(){return settings().proxyUrl||""}
-async function fetchMetalDirect(metal){const key=settings().metalsKey;if(!key)throw Error("No Metals.Dev key configured");return fetchJson("https://api.metals.dev/v1/metal/spot?metal="+encodeURIComponent(metal)+"&currency=GBP",{headers:{"api-key":key}})}
-async function fetchMetalViaProxy(metal){const base=proxyBase();if(!base)throw Error("No proxy configured");return fetchJson(base+"/metals/"+encodeURIComponent(metal))}
-function parseMetal(d){const p=d?.rate?.price??d?.price??d?.metals?.[d?.metal];if(!isFinite(+p)||+p<=0)throw Error("Invalid metal price");return +p}
-async function refreshMarket(){const st=$("marketStatus");st.textContent="Refreshing…";try{const out={};for(const m of ["gold","silver","copper"]){let d;try{d=await fetchMetalViaProxy(m)}catch{d=await fetchMetalDirect(m)}out[m]=parseMetal(d)}liveMarket={gold:out.gold,silver:out.silver,copper:out.copper,updated:new Date().toISOString(),source:proxyBase()?"Secure proxy":"Metals.Dev"};$("goldPrice").value=out.gold.toFixed(2);$("silverPrice").value=out.silver.toFixed(2);$("copperPrice").value=out.copper.toFixed(2);localStorage.setItem("priceSilver",out.silver);localStorage.setItem("priceGold",out.gold);localStorage.setItem("priceCopper",out.copper);updateLiveUI();render()}catch(e){liveMarket={silver:null,gold:null,copper:null,updated:null,source:"fallback"};updateLiveUI();render();throw e}}
-function updateLiveUI(){const sp=metalPrice("Silver"),gp=metalPrice("Gold"),cp=metalPrice("Copper");$("liveSilver").textContent=fmtGBP(sp)+"/oz";$("liveGold").textContent=fmtGBP(gp)+"/oz";$("liveCopper").textContent=fmtGBP(cp)+"/kg";const meta=liveMarket.source==="fallback"?"Manual fallback":liveMarket.source+(liveMarket.updated?" • "+fmtTime(liveMarket.updated):"");$("liveSilverMeta").textContent=meta;$("liveGoldMeta").textContent=meta;$("liveCopperMeta").textContent=meta;$("marketStatus").textContent=liveMarket.source==="fallback"?"Fallback prices":"Live • "+liveMarket.source;$("marketStatus").className=liveMarket.source==="fallback"?"warn":"good"}
-function updateValuationSummary(){let live=0,manual=0,heur=0;for(const x of items){if(x.yourValue!==""&&isFinite(+x.yourValue))manual++;else if(x.marketLow&&x.marketHigh)live++;else heur++}$("valuationSummary").innerHTML=`<div class="statgrid"><div class="stat"><span class="small">Coins with live match</span><b>${live}</b></div><div class="stat"><span class="small">Heuristic estimates</span><b>${heur}</b></div><div class="stat"><span class="small">Your own values</span><b>${manual}</b></div><div class="stat"><span class="small">Collection melt</span><b>${fmtGBP(items.reduce((n,x)=>n+melt(x),0))}</b></div></div>`}
-function coinQuery(x){return [x.name,x.year,x.mint,x.metal].filter(Boolean).join(" ").trim()}
-async function numistaSearch(x){const q=coinQuery(x);if(!q)throw Error("Coin needs a name or search words");const base=proxyBase();if(!base)throw Error("Connect the secure market proxy in Settings first");const d=await fetchJson(base+"/numista/search?q="+encodeURIComponent(q));return Array.isArray(d?.types)?d.types:(Array.isArray(d)?d:[])}
-async function numistaSales(id){const base=proxyBase();if(!base)throw Error("No proxy configured");const d=await fetchJson(base+"/numista/types/"+encodeURIComponent(id)+"/sales_records");return Array.isArray(d?.sales_records)?d.sales_records:(Array.isArray(d?.sales)?d.sales:(Array.isArray(d)?d:[]))}
-function poundsFromSale(s){const p=s?.price??s?.amount??s?.value??s?.hammer_price??s?.sold_price;if(!isFinite(+p)||+p<=0)return null;const cur=String(s?.currency||s?.currency_code||"").toUpperCase();return cur==="GBP"?+p:null}
-function estimateFromSales(x,sales){const vals=(sales||[]).map(poundsFromSale).filter(v=>v!=null&&v>0);if(!vals.length)return null;vals.sort((a,b)=>a-b);const q=(p)=>vals[Math.max(0,Math.min(vals.length-1,Math.floor((vals.length-1)*p)))];const med=q(.5),lo=q(.25),hi=q(.75),m=melt(x);return {low:Math.max(m,lo),high:Math.max(Math.max(m,lo),hi),mid:med,source:"Numista sales records",confidence:vals.length>=8?"High":vals.length>=4?"Medium":"Low",count:vals.length}}
-function chooseNumistaMatch(x,matches){const tokens=[String(x.name||""),String(x.year||""),String(x.mint||"")].join(" ").toLowerCase().split(/[^a-z0-9]+/).filter(t=>t.length>1);return [...matches].sort((a,b)=>{const sa=String(a.title||a.name||"").toLowerCase(),sb=String(b.title||b.name||"").toLowerCase();const score=v=>tokens.reduce((n,t)=>n+(v.includes(t)?(t===String(x.year||"").toLowerCase()?5:2):0),0)+(v.includes(String(x.metal||"").toLowerCase())?3:0);return score(sb)-score(sa)})[0]}
-async function refreshOneValuation(x){const matches=await numistaSearch(x);if(!matches.length)throw Error("No Numista match");const best=chooseNumistaMatch(x,matches),id=best.id??best.type_id??best.typeId;if(!id)throw Error("Match has no type ID");const sales=await numistaSales(id),r=estimateFromSales(x,sales);if(!r)throw Error("Matched coin has no usable sales records");x.numistaId=String(id);x.marketLow=r.low;x.marketHigh=r.high;x.marketMid=r.mid;x.marketSource=r.source+" (N#"+id+")";x.marketUpdated=new Date().toISOString();x.marketConfidence=r.confidence;await put(x);return r}
-async function refreshValuations(){const st=$("valuationStatus");let ok=0,fail=0;for(let i=0;i<items.length;i++){st.textContent=`Refreshing coin ${i+1} of ${items.length}…`;try{await refreshOneValuation(items[i]);ok++}catch{fail++}}await load();updateValuationSummary();st.textContent=`Finished. ${ok} live market estimate(s) updated; ${fail} coin(s) could not be matched or priced.`}
-async function clearMarketMatches(){if(!confirm("Clear all live market matches and estimates? Your coins and photos will remain."))return;for(const x of items){x.numistaId="";x.marketLow="";x.marketHigh="";x.marketMid="";x.marketSource="";x.marketUpdated="";x.marketConfidence="";await put(x)}await load();updateValuationSummary();$("valuationStatus").textContent="Live market matches cleared."}
-$("refreshMarket").onclick=async()=>{try{await refreshMarket()}catch(e){$("marketHelp").textContent="Live price refresh failed: "+e.message+". Saved fallback prices remain in use."}};$("savePrices").onclick=()=>{localStorage.setItem("priceSilver",$("silverPrice").value);localStorage.setItem("priceGold",$("goldPrice").value);localStorage.setItem("priceCopper",$("copperPrice").value);liveMarket={silver:null,gold:null,copper:null,updated:null,source:"fallback"};updateLiveUI();render()};$("saveSettings").onclick=()=>{$("settingsStatus").textContent="Settings saved on this device.";saveSettings()};$("testConnection").onclick=async()=>{try{saveSettings();await refreshMarket();$("settingsStatus").textContent="Metal connection works."}catch(e){$("settingsStatus").textContent="Connection test failed: "+e.message}};$("refreshValuations").onclick=async()=>{try{await refreshValuations()}catch(e){$("valuationStatus").textContent="Valuation refresh stopped: "+e.message}};$("clearMarketMatches").onclick=clearMarketMatches;
-
-(async()=>{loadSettings();const n=await migrateOld();await load();if(n)$("recoveryStatus").textContent=`Recovered ${n} existing listing(s) into Version 13. Nothing was deleted.`;updateLiveUI();updateValuationSummary()})().catch(e=>$("status").textContent="Database error: "+e.message);
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=13").catch(()=>{});
+(async()=>{const n=await migrateOld();await load();if(n)$("recoveryStatus").textContent=`Recovered ${n} existing listing(s) into Version 14. Nothing was deleted.`;showEstimatePreview()})().catch(e=>$("status").textContent="Database error: "+e.message);
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=14").catch(()=>{});
 </script>
 </body></html>
